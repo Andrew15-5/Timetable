@@ -16,11 +16,12 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.math.ceil
+import kotlin.math.max
 
 
 @Suppress("LocalVariableName", "PrivatePropertyName")
 class MainActivity : AppCompatActivity() {
-  private val TEXT_SIZE = 18F
+  private val TEXT_SIZE = 16F // 18F
 
   private fun getTime(str: Any = "now", returnType: String = "string"): Any {
     val h: Int
@@ -92,36 +93,39 @@ class MainActivity : AppCompatActivity() {
     )
 
     val Monday = arrayOf(
-      "PE 2",
-      "Physics 5-232 (lecture)",
-      "Integral and dif equations 5-208 (lecture)", // differentiated
-      "High-level programming 5-232 (lecture)"
+      "", // - / Physics 1-415 (exercise)
+      "Physics 1-414 (lab)",
+      "PE 2"
     )
+    // 4. Machine-dependent PL 5-222 (lab) II
     val Tuesday = arrayOf(
-      "-",
-      "Integral and dif equations 7-407 (exercise)",
-      ""
-    ) // numerator/denominator
-    val Wednesday = arrayOf(
-      "PE 2",
-      "Fundamentals of SE 5-222 (lab)",
-      "High-level programming 5-158 (lab)"
+      "Physics 5-232 (lecture)",
+      "", // Philosophy 5-232 (lecture) / Machine-dependent PL 5-232 (lecture)
+      "Discrete Mathematics 7-404 (exercise)"
     )
+    val Wednesday = arrayOf(
+      "High-level programming 5-232 (lecture)",
+      "Fundamentals of electr. 5-232 (lecture)", // electronics
+      "PE 2",
+      ""
+    ) // Discrete Mathematics 3-203 (lab) I / II
     val Thursday = arrayOf(
       "English 1 (exercise)",
-      "History 5-232 (lecture)",
-      "Fundamentals of SE 5-108 (lecture)", // software engineering
-      "Linear algebra and FMP 5-208 (lecture)"
-    )
+      "Discrete Mathematics 1-415 (lecture)",
+      "Machine-dependent PL 5-222 (lab)"
+    ) // I
     val Friday = arrayOf(
       "-",
-      "Linear algebra and FMP 7-407 (exercise)",
+      "-",
+      "", // Machine-dependent PL 5-222 (lab) II / I
+      "Philosophy 5-210 (exercise)",
+      "", // High-level programming 5-219 (lab) I / II
       ""
-    ) // numerator/denominator
+    ) // High-level programming 5-219 (lab) I / II
     val Saturday = arrayOf(
-      "High-level programming 5-158 (lab)",
-      "High-level programming 5-158 (lab)"
-    )
+      "", // High-level programming 5-219 (exercise) / Fundamentals of electronics 5-231 (exercise)
+      ""
+    ) // Fundamentals of electronics 5-231 (lab) I / II
 
     val timeTable = mutableListOf<MutableList<TextView>>()
     for (i in 0..5) timeTable.add(mutableListOf())
@@ -137,7 +141,9 @@ class MainActivity : AppCompatActivity() {
       30600, 33300, 33600, 36300,
       37200, 39900, 40200, 42900,
       43800, 46500, 46800, 49500,
-      51300, 54000, 54300, 57000
+      51300, 54000, 54300, 57000,
+      57900, 60600, 60900, 63600,
+      64200, 66900, 67200, 69900
     )
 
     val timePeriod = arrayOf(
@@ -147,7 +153,11 @@ class MainActivity : AppCompatActivity() {
       "11:55-12:10",
       "12:10-12:55 | 13:00-13:45",
       "13:45-14:15",
-      "14:15-15:00 | 15:05-15:50"
+      "14:15-15:00 | 15:05-15:50",
+      "15:50-16:05",
+      "16:05-16:50 | 16:55-17:40",
+      "17:40-17:50",
+      "17:50-18:35 | 18:40-19:25"
     )
 
     val timeTimeTable = mutableListOf<TextView>()
@@ -172,6 +182,14 @@ class MainActivity : AppCompatActivity() {
         if (x in timings[12] until timings[13]) return Pair(4, 1)
         else if (x in timings[14] until timings[15]) return Pair(4, 2)
       }
+      if (y == -1 || y == 8) {
+        if (x in timings[16] until timings[17]) return Pair(5, 1)
+        else if (x in timings[18] until timings[19]) return Pair(5, 2)
+      }
+      if (y == -1 || y == 10) {
+        if (x in timings[20] until timings[21]) return Pair(6, 1)
+        else if (x in timings[22] until timings[23]) return Pair(6, 2)
+      }
       return false
     }
 
@@ -184,6 +202,10 @@ class MainActivity : AppCompatActivity() {
         in timings[9] until timings[10] -> 3
         in timings[11] until timings[12] -> 34
         in timings[13] until timings[14] -> 4
+        in timings[15] until timings[16] -> 45
+        in timings[17] until timings[18] -> 5
+        in timings[19] until timings[20] -> 56
+        in timings[21] until timings[22] -> 6
         else -> false
       }
     }
@@ -203,7 +225,7 @@ class MainActivity : AppCompatActivity() {
 //    var even = true;
 //    var j = 0
 //    var k = 0
-//    var t = 27000
+//    var t = 43000
 
     val calendar = Calendar.getInstance()
     val loopHandler = Handler(Looper.getMainLooper())
@@ -244,50 +266,55 @@ class MainActivity : AppCompatActivity() {
           k++
           k %= dayArray.size
         }*/
+
         val day = calendar.get(Calendar.DAY_OF_WEEK)
-
-/*        val day = Calendar.MONDAY
-        val day = Calendar.TUESDAY
-        val day = Calendar.WEDNESDAY
-        val day = Calendar.THURSDAY
-        val day = Calendar.FRIDAY
-        val day = Calendar.SATURDAY
-        val day = Calendar.SUNDAY*/
-
         val current_year = Calendar.getInstance().get(Calendar.YEAR)
+        val sept1 = LocalDate.of(current_year, 9, 1)
+        val days_between_1st_day_of_1st_week_and_1st_working_day =
+          sept1.dayOfWeek.value - 1 // getValue(): Mon -> 1 ... Sun -> 7
         val days_offset =
-          ChronoUnit.DAYS.between(LocalDate.of(current_year, 2, 8), LocalDateTime.now())
-        println(LocalDate.of(current_year, 2, 8))
-        println(LocalDateTime.now())
-        println(days_offset)
-        var week = ceil(days_offset.toFloat() / 7 + 0.0001).toInt()
-        println(week)
+          days_between_1st_day_of_1st_week_and_1st_working_day + ChronoUnit.DAYS.between(
+            sept1,
+            LocalDateTime.now()
+          )
+//        println(days_offset)
+        var week = ceil(days_offset.toFloat() / 7).toInt()
+//        println(week)
         if (day == Calendar.SUNDAY) week++ // Sunday is already in the next week
         val dnm = week % 2 == 0
         TimeAndWeek.text = "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
 
-//        if (!even) {
-//          dnm = !dnm
-//        }
-//        even = !even
-
-        timeTable[1][3].text =
-          "3. " + (if (dnm) "History 1-205 (exercise)" else "Physics 1-405 (lab)")
+        timeTable[0][1].text =
+          "1. " + (if (dnm) "Physics 1-415 (exercise)" else "-")
+        timeTable[1][2].text =
+          "2. " + (if (dnm) "Machine-dependent PL 5-232 (lecture)" else "Philosophy 5-232 (lecture)")
+        timeTable[2][4].text =
+          "4. " + (if (dnm) "Discrete Mathematics 3-203 (lab)" else "-") // visibility
         timeTable[4][3].text =
-          "3. " + (if (dnm) "High-level programming 5-162" else "Physics 1-413") + " (exercise)"
+          "3. " + (if (dnm) "Machine-dependent PL 5-222 (lab)" else "-")
+        timeTable[4][5].text =
+          "5. " + (if (dnm) "-" else "High-level programming 5-219 (lab)") // visibility
+        timeTable[4][6].text =
+          "6. " + (if (dnm) "-" else "High-level programming 5-219 (lab)") // visibility
+        timeTable[5][1].text =
+          "1. " + (if (dnm) "Fundamentals of electr. 5-231" else "High-level programming 5-219") + " (exercise)"
+        timeTable[5][2].text =
+          "2. " + (if (dnm) "-" else "Fundamentals of electronics 5-231 (lab)") // visibility
         if (dnm) {
-          timeTable[0][4].visibility = View.GONE
-          timeTable[5][1].visibility = View.VISIBLE
-          timeTable[5][2].visibility = View.VISIBLE
-        } else {
-          timeTable[0][4].visibility = View.VISIBLE
-          timeTable[5][1].visibility = View.GONE
+          timeTable[2][4].visibility = View.VISIBLE
+          timeTable[4][5].visibility = View.GONE
+          timeTable[4][6].visibility = View.GONE
           timeTable[5][2].visibility = View.GONE
+        } else {
+          timeTable[2][4].visibility = View.GONE
+          timeTable[4][5].visibility = View.VISIBLE
+          timeTable[4][6].visibility = View.VISIBLE
+          timeTable[5][2].visibility = View.VISIBLE
         }
 
 //          t += 200
-//          t %= 58000
-//          t = max(t, 27000)
+//          t %= 71000
+//          t = max(t, 43000)
 //        val t = timeArray[j]
 //        j++
 //        j %= timeArray.size
@@ -352,7 +379,7 @@ class MainActivity : AppCompatActivity() {
 
         var timeUntilNextLesson: String
         when {
-          otherTime || index > 13 -> {
+          otherTime || index > (timings.size - 3) -> {
             timeUntilNextLesson = "     --:--"
             if (otherTime && t < 30600) {
               timeUntilNextLesson = getTime(timings[0] - t) as String
@@ -375,7 +402,7 @@ class MainActivity : AppCompatActivity() {
         }
         var timeUntilNextPair: String
         when {
-          otherTime || index > 11 -> {
+          otherTime || index > (timings.size - 5) -> {
             timeUntilNextPair = "     --:--"
             if (otherTime && t < 30600) {
               timeUntilNextPair = getTime(timings[0] - t) as String
