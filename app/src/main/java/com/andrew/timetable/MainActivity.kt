@@ -11,8 +11,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.andrew.timetable.R.color.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.math.ceil
 
 
 @Suppress("LocalVariableName", "PrivatePropertyName")
@@ -83,26 +86,42 @@ class MainActivity : AppCompatActivity() {
     setContentView(R.layout.activity_main)
     TimeAndWeek.textSize = TEXT_SIZE
     // Fully transparent navigation & status bars
-    window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+    window.setFlags(
+      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+    )
 
-    val Monday = arrayOf("PE 2",
-      " ",
-      "Cultural studies 5-208 (lecture)",
-      "High-level programming 5-158 (lab)")
-    val Tuesday = arrayOf("English 1-213 (exercise)",
-      "Mathematical analysis 7-407 (exercise)")
-    val Wednesday = arrayOf("PE 2",
-      "Analytic geometry 7-411 (exercise)",
-      "Theoretical informatics 5-222 (lab)")
-    val Thursday = arrayOf("",
-      "Engineering graphics 1-311 (exercise)",
-      "Mathematical analysis 5-232 (lecture)")
-    val Friday = arrayOf("High-level programming 5-158 (lab)",
-      "Analytic geometry 5-202 (lecture)",
-      "Engineering graphics 3-212 (lab)")
-    val Saturday = arrayOf("High-level programming 5-232 (lecture)",
-      "High-level programming 5-162 (exercise)")
+    val Monday = arrayOf(
+      "PE 2",
+      "Physics 5-232 (lecture)",
+      "Integral and dif equations 5-208 (lecture)", // differentiated
+      "High-level programming 5-232 (lecture)"
+    )
+    val Tuesday = arrayOf(
+      "-",
+      "Integral and dif equations 7-407 (exercise)",
+      ""
+    ) // numerator/denominator
+    val Wednesday = arrayOf(
+      "PE 2",
+      "Fundamentals of SE 5-222 (lab)",
+      "High-level programming 5-158 (lab)"
+    )
+    val Thursday = arrayOf(
+      "English 1 (exercise)",
+      "History 5-232 (lecture)",
+      "Fundamentals of SE 5-108 (lecture)", // software engineering
+      "Linear algebra and FMP 5-208 (lecture)"
+    )
+    val Friday = arrayOf(
+      "-",
+      "Linear algebra and FMP 7-407 (exercise)",
+      ""
+    ) // numerator/denominator
+    val Saturday = arrayOf(
+      "High-level programming 5-158 (lab)",
+      "High-level programming 5-158 (lab)"
+    )
 
     val timeTable = mutableListOf<MutableList<TextView>>()
     for (i in 0..5) timeTable.add(mutableListOf())
@@ -118,7 +137,8 @@ class MainActivity : AppCompatActivity() {
       30600, 33300, 33600, 36300,
       37200, 39900, 40200, 42900,
       43800, 46500, 46800, 49500,
-      51300, 54000, 54300, 57000)
+      51300, 54000, 54300, 57000
+    )
 
     val timePeriod = arrayOf(
       "8:30 - 9:15 | 9:20 -10:05",
@@ -127,7 +147,8 @@ class MainActivity : AppCompatActivity() {
       "11:55-12:10",
       "12:10-12:55 | 13:00-13:45",
       "13:45-14:15",
-      "14:15-15:00 | 15:05-15:50")
+      "14:15-15:00 | 15:05-15:50"
+    )
 
     val timeTimeTable = mutableListOf<TextView>()
     for (line in timePeriod) {
@@ -233,10 +254,16 @@ class MainActivity : AppCompatActivity() {
         val day = Calendar.SATURDAY
         val day = Calendar.SUNDAY*/
 
-        var week = calendar.get(Calendar.WEEK_OF_YEAR)
-//        if (day == Calendar.SUNDAY) week++ // Sunday is already in the next week
-        var dnm: Boolean = week % 2 != 0
-        week += if (week >= 35) -35 else 18
+        val current_year = Calendar.getInstance().get(Calendar.YEAR)
+        val days_offset =
+          ChronoUnit.DAYS.between(LocalDate.of(current_year, 2, 8), LocalDateTime.now())
+        println(LocalDate.of(current_year, 2, 8))
+        println(LocalDateTime.now())
+        println(days_offset)
+        var week = ceil(days_offset.toFloat() / 7 + 0.0001).toInt()
+        println(week)
+        if (day == Calendar.SUNDAY) week++ // Sunday is already in the next week
+        val dnm = week % 2 == 0
         TimeAndWeek.text = "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
 
 //        if (!even) {
@@ -244,15 +271,18 @@ class MainActivity : AppCompatActivity() {
 //        }
 //        even = !even
 
-        timeTable[0][2].text =
-          "2. " + (if (dnm) "Engineering graphics 1-306" else "Theoretical informatics 5-108") + " (lecture)"
-        timeTable[3][1].text = "1. " + (if (dnm) "-" else "Cultural studies 1-203 (exercise)")
+        timeTable[1][3].text =
+          "3. " + (if (dnm) "History 1-205 (exercise)" else "Physics 1-405 (lab)")
+        timeTable[4][3].text =
+          "3. " + (if (dnm) "High-level programming 5-162" else "Physics 1-413") + " (exercise)"
         if (dnm) {
-          timeTable[2][3].visibility = View.VISIBLE
-          timeTable[5][2].visibility = View.GONE
-        } else {
-          timeTable[2][3].visibility = View.GONE
+          timeTable[0][4].visibility = View.GONE
+          timeTable[5][1].visibility = View.VISIBLE
           timeTable[5][2].visibility = View.VISIBLE
+        } else {
+          timeTable[0][4].visibility = View.VISIBLE
+          timeTable[5][1].visibility = View.GONE
+          timeTable[5][2].visibility = View.GONE
         }
 
 //          t += 200
@@ -316,13 +346,13 @@ class MainActivity : AppCompatActivity() {
 
         var lessonsTimeLeft = ""
         when {
-          otherTime || index as Int % 2 == 1 -> lessonsTimeLeft = "   --:--  "
+          otherTime || index % 2 == 1 -> lessonsTimeLeft = "   --:--  "
           index % 2 == 0 -> lessonsTimeLeft = getTime(timings[index + 1] - t) as String
         }
 
-        var timeUntilNextLesson = ""
+        var timeUntilNextLesson: String
         when {
-          otherTime || index as Int > 13 -> {
+          otherTime || index > 13 -> {
             timeUntilNextLesson = "     --:--"
             if (otherTime && t < 30600) {
               timeUntilNextLesson = getTime(timings[0] - t) as String
@@ -335,17 +365,17 @@ class MainActivity : AppCompatActivity() {
           }
         }
 
-        var pairsTimeLeft = ""
+        var pairsTimeLeft: String
         when {
-          otherTime || index as Int % 4 == 3 -> pairsTimeLeft = "      --:--  "
+          otherTime || index % 4 == 3 -> pairsTimeLeft = "      --:--  "
           else -> {
             pairsTimeLeft = getTime(timings[index - index % 4 + 3] - t) as String
             if (pairsTimeLeft.length < 7) pairsTimeLeft = "   $pairsTimeLeft"
           }
         }
-        var timeUntilNextPair = ""
+        var timeUntilNextPair: String
         when {
-          otherTime || index as Int > 11 -> {
+          otherTime || index > 11 -> {
             timeUntilNextPair = "     --:--"
             if (otherTime && t < 30600) {
               timeUntilNextPair = getTime(timings[0] - t) as String
