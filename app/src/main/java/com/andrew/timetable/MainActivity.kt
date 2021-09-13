@@ -13,10 +13,8 @@ import com.andrew.timetable.R.color.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+import java.time.temporal.ChronoField
 import java.util.*
-import kotlin.math.ceil
-import kotlin.math.max
 
 
 @Suppress("LocalVariableName", "PrivatePropertyName")
@@ -267,20 +265,14 @@ class MainActivity : AppCompatActivity() {
           k %= dayArray.size
         }*/
 
-        val day = calendar.get(Calendar.DAY_OF_WEEK)
-        val current_year = Calendar.getInstance().get(Calendar.YEAR)
+        val day_of_week = calendar.get(Calendar.DAY_OF_WEEK)
+        val current_year = calendar.get(Calendar.YEAR)
         val sept1 = LocalDate.of(current_year, 9, 1)
-        val days_between_1st_day_of_1st_week_and_1st_working_day =
-          sept1.dayOfWeek.value - 1 // getValue(): Mon -> 1 ... Sun -> 7
-        val days_offset =
-          days_between_1st_day_of_1st_week_and_1st_working_day + ChronoUnit.DAYS.between(
-            sept1,
-            LocalDateTime.now()
-          )
-//        println(days_offset)
-        var week = ceil(days_offset.toFloat() / 7).toInt()
-//        println(week)
-        if (day == Calendar.SUNDAY) week++ // Sunday is already in the next week
+        val first_week_of_year = sept1.get(ChronoField.ALIGNED_WEEK_OF_YEAR)
+        val weeks_offset =
+          LocalDate.now().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - first_week_of_year
+        var week = weeks_offset + 1
+        if (day_of_week == Calendar.SUNDAY) week++ // Sunday is already in the next week
         val dnm = week % 2 == 0
         TimeAndWeek.text = "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
 
@@ -323,14 +315,14 @@ class MainActivity : AppCompatActivity() {
         // Color Timetable
         val t = getTime("now", "int") as Int
         for ((weekDay, Day) in timeTable.withIndex()) {
-          val defaultColor = (if (weekDay + 2 == day) yellow else green)
+          val defaultColor = (if (weekDay + 2 == day_of_week) yellow else green)
           var color = defaultColor
           for ((i, pair) in Day.withIndex()) {
             if (i == 0) {
               pair.setTextColor(getColor(color))
             } else {
               color = when {
-                weekDay + 2 == day && studyTime(t, (i - 1) * 2) is Pair<*, *> -> red
+                weekDay + 2 == day_of_week && studyTime(t, (i - 1) * 2) is Pair<*, *> -> red
                 else -> defaultColor
               }
               pair.setTextColor(getColor(color))
