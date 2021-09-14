@@ -10,10 +10,11 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.andrew.timetable.R.color.*
+import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.android.synthetic.main.activity_main.*
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.temporal.ChronoField
+import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.temporal.ChronoField
 import java.util.*
 
 
@@ -82,6 +83,7 @@ class MainActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    AndroidThreeTen.init(this)
     setContentView(R.layout.activity_main)
     TimeAndWeek.textSize = TEXT_SIZE
     // Fully transparent navigation & status bars
