@@ -10,8 +10,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.andrew.timetable.R.color.*
+import com.andrew.timetable.databinding.ActivityMainBinding
 import com.jakewharton.threetenabp.AndroidThreeTen
-import kotlinx.android.synthetic.main.activity_main.*
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.temporal.ChronoField
@@ -62,8 +62,8 @@ class MainActivity : AppCompatActivity() {
       textAlignment = View.TEXT_ALIGNMENT_CENTER
       text = str
       when {
-        toSubjectLayout -> SubjectsLayout.addView(this)
-        else -> TimeLayout.addView(this)
+        toSubjectLayout -> binding.SubjectsLayout.addView(this)
+        else -> binding.TimeLayout.addView(this)
       }
     }
     return textView
@@ -80,12 +80,16 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
+  private lateinit var binding: ActivityMainBinding
+
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     AndroidThreeTen.init(this)
-    setContentView(R.layout.activity_main)
-    TimeAndWeek.textSize = TEXT_SIZE
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    val view = binding.root
+    setContentView(view)
+    binding.TimeAndWeek.textSize = TEXT_SIZE
     // Fully transparent navigation & status bars
     window.setFlags(
       WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -276,7 +280,8 @@ class MainActivity : AppCompatActivity() {
         var week = weeks_offset + 1
         if (day_of_week == Calendar.SUNDAY) week++ // Sunday is already in the next week
         val dnm = week % 2 == 0
-        TimeAndWeek.text = "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
+        binding.TimeAndWeek.text =
+          "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
 
         timeTable[0][1].text =
           "1. " + (if (dnm) "Physics 1-415 (exercise)" else "-")
@@ -408,9 +413,9 @@ class MainActivity : AppCompatActivity() {
             if (timeUntilNextPair.length < 7) timeUntilNextPair = "   $timeUntilNextPair"
           }
         }
-        LessonTextView.text =
+        binding.LessonTextView.text =
           "Lesson's time left: $lessonsTimeLeft | Time until next lesson: $timeUntilNextLesson"
-        PairTextView.text =
+        binding.PairTextView.text =
           "Pair's time left:    $pairsTimeLeft | Time until next pair:      $timeUntilNextPair"
 
         loopHandler.postDelayed(this, 200)
