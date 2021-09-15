@@ -20,7 +20,7 @@
         <item name="android:textColor">@color/white</item>
     </style>
     <color name="green">#10D627</color>
-    <color name="blue">#0D27EC</color>
+    <color name="time_and_week">#0D27EC</color>
     <color name="yellow">#D1CE13</color>
     <color name="red">#C31717</color>
     <color name="purple">#A219BA</color>

@@ -27,7 +27,7 @@
                 android:background="@null"
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
-                android:textColor="@color/blue"
+                android:textColor="@color/time_and_week"
                 tools:ignore="Autofill,LabelFor" />
 
             <LinearLayout
