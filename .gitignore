@@ -1,6 +1,7 @@
 .tags
 .idea/deploymentTargetDropDown.xml
 .idea/misc.xml
+/*.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/kotlin,androidstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=kotlin,androidstudio

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
@@ -12,13 +13,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.andrew.timetable.R.color.*
 import com.andrew.timetable.databinding.ActivityMainBinding
 import com.jakewharton.threetenabp.AndroidThreeTen
+import org.json.JSONArray
+import org.json.JSONObject
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.temporal.ChronoField
 import java.util.*
 
 
-@Suppress("LocalVariableName", "PrivatePropertyName")
 class MainActivity : AppCompatActivity() {
   private val TEXT_SIZE = 16F // 18F
 
@@ -71,18 +73,45 @@ class MainActivity : AppCompatActivity() {
 
   private fun createWeekDaySubjectTable(
     textViewList: MutableList<TextView>,
-    subjectList: Array<String>,
-    weekDay: String
+    timetable_config: JSONObject,
+    week_day: String
   ) {
-    textViewList.add(createTextView(weekDay))
-    for (i in 1..subjectList.size) {
-      textViewList.add(createTextView("$i. ${subjectList[i - 1]}"))
+    val subjects: JSONObject = timetable_config[week_day] as JSONObject
+    textViewList.add(createTextView(week_day))
+    for (lessons_order in subjects.keys()) {
+      var subject = ""
+      with(subjects[lessons_order]) {
+        if (this is String) subject = this
+//        when (this) {
+//          is String -> subject = this
+//          is Array<*> -> {
+//
+//          }
+//        }
+      }
+      textViewList.add(createTextView("$lessons_order. $subject"))
+    }
+  }
+
+  private fun repopulate_SubjectLayout(
+    timetable_configs: TimetableConfigs,
+    timeTable: MutableList<MutableList<TextView>>,
+    config_index: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT
+  ) {
+    binding.SubjectsLayout.removeAllViews()
+    timeTable.forEach { it.clear() }
+    for (week_day in timetable_configs.config(config_index).keys().withIndex()) {
+      createWeekDaySubjectTable(
+        timeTable[week_day.index],
+        timetable_configs.current_config(),
+        week_day.value
+      )
     }
   }
 
   private lateinit var binding: ActivityMainBinding
 
-  @SuppressLint("SetTextI18n")
+  @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     AndroidThreeTen.init(this)
@@ -96,50 +125,30 @@ class MainActivity : AppCompatActivity() {
       WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
     )
 
-    val Monday = arrayOf(
-      "", // - / Physics 1-415 (exercise)
-      "Physics 1-414 (lab)",
-      "PE 2"
-    )
-    // 4. Machine-dependent PL 5-222 (lab) II
-    val Tuesday = arrayOf(
-      "Physics 5-232 (lecture)",
-      "", // Philosophy 5-232 (lecture) / Machine-dependent PL 5-232 (lecture)
-      "Discrete Mathematics 7-404 (exercise)"
-    )
-    val Wednesday = arrayOf(
-      "High-level programming 5-232 (lecture)",
-      "Fundamentals of electr. 5-232 (lecture)", // electronics
-      "PE 2",
-      ""
-    ) // Discrete Mathematics 3-203 (lab) I / II
-    val Thursday = arrayOf(
-      "English 1 (exercise)",
-      "Discrete Mathematics 1-415 (lecture)",
-      "Machine-dependent PL 5-222 (lab)"
-    ) // I
-    val Friday = arrayOf(
-      "-",
-      "-",
-      "", // Machine-dependent PL 5-222 (lab) II / I
-      "Philosophy 5-210 (exercise)",
-      "", // High-level programming 5-219 (lab) I / II
-      ""
-    ) // High-level programming 5-219 (lab) I / II
-    val Saturday = arrayOf(
-      "", // High-level programming 5-219 (exercise) / Fundamentals of electronics 5-231 (exercise)
-      ""
-    ) // Fundamentals of electronics 5-231 (lab) I / II
+    // JSON nth subject values:
+    // 1) "Subject" -
+    //   same "Subject" every week
+    // 2) ["Numerator subject", "Denominator subject"] -
+    //   "Numerator subject" on numerator week, "Denominator subject" on denominator week
+    // 3.1) ["", "Denominator subject"] -
+    //   no nth subject on numerator week, "Denominator subject" on denominator subject
+    // 3.2) ["Numerator subject", ""] -
+    //   "Numerator subject" on numerator subject, no nth subject on denominator week
+    val config_names = arrayOf("IMK4_3s.json", "IMK4_3s_custom.json")
 
-    val timeTable = mutableListOf<MutableList<TextView>>()
-    for (i in 0..5) timeTable.add(mutableListOf())
-
-    createWeekDaySubjectTable(timeTable[0], Monday, "Monday")
-    createWeekDaySubjectTable(timeTable[1], Tuesday, "Tuesday")
-    createWeekDaySubjectTable(timeTable[2], Wednesday, "Wednesday")
-    createWeekDaySubjectTable(timeTable[3], Thursday, "Thursday")
-    createWeekDaySubjectTable(timeTable[4], Friday, "Friday")
-    createWeekDaySubjectTable(timeTable[5], Saturday, "Saturday")
+    val timetable_configs = TimetableConfigs(assets, config_names, 1)
+    val timeTable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
+    repopulate_SubjectLayout(timetable_configs, timeTable)
+    binding.SubjectsLayout.setOnTouchListener { _, event ->
+      when (event.action) {
+        MotionEvent.ACTION_DOWN -> {
+//          val x = event.x.toInt()
+//          val y = event.y.toInt()
+          repopulate_SubjectLayout(timetable_configs, timeTable, TimetableConfigs.Config.NEXT)
+        }
+      }
+      true
+    }
 
     val timings = arrayOf(
       30600, 33300, 33600, 36300,
@@ -234,7 +243,6 @@ class MainActivity : AppCompatActivity() {
     val calendar = Calendar.getInstance()
     val loopHandler = Handler(Looper.getMainLooper())
     loopHandler.post(object : Runnable {
-      @SuppressLint("ResourceAsColor")
       override fun run() {
 
 /*        val dayArray = arrayOf(
@@ -283,32 +291,26 @@ class MainActivity : AppCompatActivity() {
         binding.TimeAndWeek.text =
           "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
 
-        timeTable[0][1].text =
-          "1. " + (if (dnm) "Physics 1-415 (exercise)" else "-")
-        timeTable[1][2].text =
-          "2. " + (if (dnm) "Machine-dependent PL 5-232 (lecture)" else "Philosophy 5-232 (lecture)")
-        timeTable[2][4].text =
-          "4. " + (if (dnm) "Discrete Mathematics 3-203 (lab)" else "-") // visibility
-        timeTable[4][3].text =
-          "3. " + (if (dnm) "Machine-dependent PL 5-222 (lab)" else "-")
-        timeTable[4][5].text =
-          "5. " + (if (dnm) "-" else "High-level programming 5-219 (lab)") // visibility
-        timeTable[4][6].text =
-          "6. " + (if (dnm) "-" else "High-level programming 5-219 (lab)") // visibility
-        timeTable[5][1].text =
-          "1. " + (if (dnm) "Fundamentals of electr. 5-231" else "High-level programming 5-219") + " (exercise)"
-        timeTable[5][2].text =
-          "2. " + (if (dnm) "-" else "Fundamentals of electronics 5-231 (lab)") // visibility
-        if (dnm) {
-          timeTable[2][4].visibility = View.VISIBLE
-          timeTable[4][5].visibility = View.GONE
-          timeTable[4][6].visibility = View.GONE
-          timeTable[5][2].visibility = View.GONE
-        } else {
-          timeTable[2][4].visibility = View.GONE
-          timeTable[4][5].visibility = View.VISIBLE
-          timeTable[4][6].visibility = View.VISIBLE
-          timeTable[5][2].visibility = View.VISIBLE
+        // Handle changes in timetable (numerator/denominator, visibility)
+        for (indexed_week_day in timetable_configs.current_config().keys().withIndex()) {
+          val subjects = timetable_configs.current_config()[indexed_week_day.value] as JSONObject
+          for (lessons_order in subjects.keys()) {
+            // tmp is either a String or JSONArray with size 2
+            // Example: either "subject name" or ["numerator subject", "denominator subject"]
+            val tmp = subjects[lessons_order]
+            if (tmp !is JSONArray) continue
+            val subject = tmp[if (dnm) 1 else 0]
+            val subject_text_view = timeTable[indexed_week_day.index][lessons_order.toInt()]
+            when (subject) {
+              "" -> subject_text_view.visibility = View.GONE
+              else -> {
+                subject_text_view.text = "$lessons_order. $subject"
+                // Check the other string in array
+                if (tmp[if (!dnm) 1 else 0] as String === "")
+                  subject_text_view.visibility = View.VISIBLE
+              }
+            }
+          }
         }
 
 //          t += 200
@@ -418,7 +420,7 @@ class MainActivity : AppCompatActivity() {
         binding.PairTextView.text =
           "Pair's time left:    $pairsTimeLeft | Time until next pair:      $timeUntilNextPair"
 
-        loopHandler.postDelayed(this, 200)
+        loopHandler.postDelayed(this, 10)
       }
     })
   }

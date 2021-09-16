@@ -1,0 +1,36 @@
+{
+  "Monday": {
+    "1": ["-", "Physics 1-415 (exercise)"],
+    "2": "Physics 1-414 (lab)",
+    "3": "PE 2",
+    "4": "Machine-dependent PL 5-222 (lab) II"
+  },
+  "Tuesday": {
+    "1": "Physics 5-232 (lecture)",
+    "2": ["Philosophy 5-232 (lecture)", "Machine-dependent PL 5-232 (lecture)"],
+    "3": "Discrete Mathematics 7-404 (exercise)"
+  },
+  "Wednesday": {
+    "1": "High-level programming 5-232 (lecture)",
+    "2": "Fundamentals of electr. 5-232 (lecture)",
+    "3": "PE 2",
+    "4": ["Discrete Mathematics 3-203 (lab) I", "Discrete Mathematics 3-203 (lab) II"]
+  },
+  "Thursday": {
+    "1": "English 1 (exercise)",
+    "2": "Discrete Mathematics 1-415 (lecture)",
+    "3": "Machine-dependent PL 5-222 (lab) I"
+  },
+  "Friday": {
+    "1": "-",
+    "2": "-",
+    "3": ["Machine-dependent PL 5-222 (lab) II", "Machine-dependent PL 5-222 (lab) I"],
+    "4": "Philosophy 5-210 (exercise)",
+    "5": ["High-level programming 5-219 (lab) I", "High-level programming 5-219 (lab) II"],
+    "6": ["High-level programming 5-219 (lab) I", "High-level programming 5-219 (lab) II"]
+  },
+  "Saturday": {
+    "1": ["High-level programming 5-219 (exercise)", "Fundamentals of electronics 5-231 (exercise)"],
+    "2": ["Fundamentals of electronics 5-231 (lab) I", "Fundamentals of electronics 5-231 (lab) II"]
+  }
+}
