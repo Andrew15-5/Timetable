@@ -17,7 +17,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
-import org.threeten.bp.temporal.ChronoField
 import java.util.*
 
 
@@ -241,6 +240,8 @@ class MainActivity : AppCompatActivity() {
 //    var t = 43000
 
     val calendar = Calendar.getInstance()
+    // Some weeks of year are wrong if minimalDaysInFirstWeek is set to default
+    calendar.minimalDaysInFirstWeek = 7
     val loopHandler = Handler(Looper.getMainLooper())
     loopHandler.post(object : Runnable {
       override fun run() {
@@ -279,15 +280,29 @@ class MainActivity : AppCompatActivity() {
           k %= dayArray.size
         }*/
 
-        val day_of_week = calendar.get(Calendar.DAY_OF_WEEK)
+        fun set_calendar_date_for_today(calendar: Calendar) {
+          val current_date = LocalDate.now()
+          // Note: month count in Calendar starts with 0 for JANUARY
+          calendar.set(current_date.year, current_date.monthValue - 1, current_date.dayOfMonth)
+        }
+
+        fun set_calendar_date(calendar: Calendar, year: Int, month: Int, day: Int) {
+          // Note: month count in Calendar starts with 0 for JANUARY
+          calendar.set(year, month - 1, day)
+        }
+
+        set_calendar_date_for_today(calendar)
+        val current_day_of_week = calendar.get(Calendar.DAY_OF_WEEK) // For coloring
         val current_year = calendar.get(Calendar.YEAR)
-        val sept1 = LocalDate.of(current_year, 9, 1)
-        val first_week_of_year = sept1.get(ChronoField.ALIGNED_WEEK_OF_YEAR)
-        val weeks_offset =
-          LocalDate.now().get(ChronoField.ALIGNED_WEEK_OF_YEAR) - first_week_of_year
-        var week = weeks_offset + 1
-        if (day_of_week == Calendar.SUNDAY) week++ // Sunday is already in the next week
-        val dnm = week % 2 == 0
+        val current_week_of_year = calendar.get(Calendar.WEEK_OF_YEAR)
+
+        set_calendar_date(calendar, current_year, 9, 1)
+        val first_week_of_academic_year = calendar.get(Calendar.WEEK_OF_YEAR)
+
+        val weeks_offset = current_week_of_year - first_week_of_academic_year
+        // Note: week starts with Sunday -> timetable and week parity will change on Sunday
+        val week = weeks_offset + 1
+        val dnm = week % 2 == 0 // abbreviation for denominator
         binding.TimeAndWeek.text =
           "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
 
@@ -324,14 +339,14 @@ class MainActivity : AppCompatActivity() {
         // Color Timetable
         val t = getTime("now", "int") as Int
         for ((weekDay, Day) in timeTable.withIndex()) {
-          val defaultColor = (if (weekDay + 2 == day_of_week) yellow else green)
+          val defaultColor = (if (weekDay + 2 == current_day_of_week) yellow else green)
           var color = defaultColor
           for ((i, pair) in Day.withIndex()) {
             if (i == 0) {
               pair.setTextColor(getColor(color))
             } else {
               color = when {
-                weekDay + 2 == day_of_week && studyTime(t, (i - 1) * 2) is Pair<*, *> -> red
+                weekDay + 2 == current_day_of_week && studyTime(t, (i - 1) * 2) is Pair<*, *> -> red
                 else -> defaultColor
               }
               pair.setTextColor(getColor(color))
