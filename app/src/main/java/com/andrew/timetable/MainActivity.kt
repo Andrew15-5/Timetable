@@ -223,7 +223,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun correctBreak(x: Int, y: Double): Boolean {
-      if (breakTime(x) is Int) println("${breakTime(x) as Int - 0.5}, $y")
       when (val ret = breakTime(x)) {
         false -> return false
         is Int -> return when {
@@ -234,51 +233,12 @@ class MainActivity : AppCompatActivity() {
       return false
     }
 
-//    var even = true;
-//    var j = 0
-//    var k = 0
-//    var t = 43000
-
     val calendar = Calendar.getInstance()
     // Some weeks of year are wrong if minimalDaysInFirstWeek is set to default
     calendar.minimalDaysInFirstWeek = 7
     val loopHandler = Handler(Looper.getMainLooper())
     loopHandler.post(object : Runnable {
       override fun run() {
-
-/*        val dayArray = arrayOf(
-          Calendar.MONDAY,
-          Calendar.TUESDAY,
-          Calendar.WEDNESDAY,
-          Calendar.THURSDAY,
-          Calendar.FRIDAY,
-          Calendar.SATURDAY,
-          Calendar.SUNDAY)
-
-        val timeArray = arrayOf(
-          8 * 3600 + 0 * 60 + 0,
-          8 * 3600 + 30 * 60 + 0,
-          9 * 3600 + 15 * 60 + 0,
-          9 * 3600 + 20 * 60 + 0,
-          10 * 3600 + 5 * 60 + 0,
-          10 * 3600 + 20 * 60 + 0,
-          11 * 3600 + 5 * 60 + 0,
-          11 * 3600 + 10 * 60 + 0,
-          11 * 3600 + 55 * 60 + 0,
-          12 * 3600 + 10 * 60 + 0,
-          12 * 3600 + 55 * 60 + 0,
-          13 * 3600 + 0 * 60 + 0,
-          13 * 3600 + 45 * 60 + 0,
-          14 * 3600 + 15 * 60 + 0,
-          15 * 3600 + 0 * 60 + 0,
-          15 * 3600 + 5 * 60 + 0,
-          15 * 3600 + 50 * 60 + 0)
-
-        val day = dayArray[k]
-        if (j == timeArray.size - 1) {
-          k++
-          k %= dayArray.size
-        }*/
 
         fun set_calendar_date_for_today(calendar: Calendar) {
           val current_date = LocalDate.now()
@@ -328,14 +288,6 @@ class MainActivity : AppCompatActivity() {
           }
         }
 
-//          t += 200
-//          t %= 71000
-//          t = max(t, 43000)
-//        val t = timeArray[j]
-//        j++
-//        j %= timeArray.size
-//        val t = 11 * 3600 + 54 * 60 + 0
-
         // Color Timetable
         val t = getTime("now", "int") as Int
         for ((weekDay, Day) in timeTable.withIndex()) {
@@ -363,7 +315,6 @@ class MainActivity : AppCompatActivity() {
 
         val currentBreak = breakTime(t)
         val currentPair = studyTime(t)
-//        var index: Any? = null
         var index = -1
         var otherTime = true
         when {
@@ -381,10 +332,6 @@ class MainActivity : AppCompatActivity() {
           }
         }
         if (index != -1) otherTime = false
-/*        when (index) {
-          null -> index = getTime()
-          else -> otherTime = false
-        }*/
 
 
         var lessonsTimeLeft = ""
