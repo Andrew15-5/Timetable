@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
   }
 
-  private fun create_TextView(str: String, toSubjectLayout: Boolean = true): TextView {
+  private fun create_TextView(str: String, parent_layout: ViewGroup): TextView {
     val text_view = TextView(this)
     with(text_view) {
       val width = RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -62,10 +63,7 @@ class MainActivity : AppCompatActivity() {
       textSize = TEXT_SIZE
       textAlignment = View.TEXT_ALIGNMENT_CENTER
       text = str
-      when {
-        toSubjectLayout -> binding.SubjectsLayout.addView(this)
-        else -> binding.TimeLayout.addView(this)
-      }
+      parent_layout.addView(this)
     }
     return text_view
   }
@@ -76,7 +74,7 @@ class MainActivity : AppCompatActivity() {
     week_day: String
   ) {
     val subjects: JSONObject = timetable_config[week_day] as JSONObject
-    text_view_list.add(create_TextView(week_day))
+    text_view_list.add(create_TextView(week_day, binding.SubjectsLayout))
     for (lessons_order in subjects.keys()) {
       var subject = ""
       with(subjects[lessons_order]) {
@@ -88,7 +86,7 @@ class MainActivity : AppCompatActivity() {
 //          }
 //        }
       }
-      text_view_list.add(create_TextView("$lessons_order. $subject"))
+      text_view_list.add(create_TextView("$lessons_order. $subject", binding.SubjectsLayout))
     }
   }
 
@@ -174,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 
     val timeTimeTable = mutableListOf<TextView>()
     for (line in time_period) {
-      timeTimeTable.add(create_TextView(line, false))
+      timeTimeTable.add(create_TextView(line, binding.TimeLayout))
     }
 
     fun study_time(x: Int, y: Int = -1): Any {
