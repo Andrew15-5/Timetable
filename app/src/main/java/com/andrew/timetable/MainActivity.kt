@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
     week_day: String
   ) {
     val subjects: JSONObject = timetable_config[week_day] as JSONObject
-    text_view_list.add(create_TextView(week_day, binding.SubjectsLayout))
+    text_view_list.add(create_TextView(week_day, binding.subjectsLayout))
     for (lessons_order in subjects.keys()) {
       var subject = ""
       with(subjects[lessons_order]) {
@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
 //          }
 //        }
       }
-      text_view_list.add(create_TextView("$lessons_order. $subject", binding.SubjectsLayout))
+      text_view_list.add(create_TextView("$lessons_order. $subject", binding.subjectsLayout))
     }
   }
 
@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
     timeTable: MutableList<MutableList<TextView>>,
     config_index: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT
   ) {
-    binding.SubjectsLayout.removeAllViews()
+    binding.subjectsLayout.removeAllViews()
     timeTable.forEach { it.clear() }
     for (week_day in timetable_configs.config(config_index).keys().withIndex()) {
       create_week_day_subject_table(
@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
     binding = ActivityMainBinding.inflate(layoutInflater)
     val view = binding.root
     setContentView(view)
-    binding.TimeAndWeek.textSize = TEXT_SIZE
+    binding.timeAndWeekTextView.textSize = TEXT_SIZE
     // Fully transparent navigation & status bars
     window.setFlags(
       WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
@@ -136,7 +136,7 @@ class MainActivity : AppCompatActivity() {
     val timetable_configs = TimetableConfigs(assets, config_names, 1)
     val timetable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
     repopulate_SubjectLayout(timetable_configs, timetable)
-    binding.SubjectsLayout.setOnTouchListener { _, event ->
+    binding.subjectsLayout.setOnTouchListener { _, event ->
       when (event.action) {
         MotionEvent.ACTION_DOWN -> {
 //          val x = event.x.toInt()
@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 
     val timeTimeTable = mutableListOf<TextView>()
     for (line in time_period) {
-      timeTimeTable.add(create_TextView(line, binding.TimeLayout))
+      timeTimeTable.add(create_TextView(line, binding.timeLayout))
     }
 
     fun study_time(x: Int, y: Int = -1): Any {
@@ -261,7 +261,7 @@ class MainActivity : AppCompatActivity() {
         // Note: week starts with Sunday -> timetable and week parity will change on Sunday
         val week = weeks_offset + 1
         val dnm = week % 2 == 0 // abbreviation for denominator
-        binding.TimeAndWeek.text =
+        binding.timeAndWeekTextView.text =
           "week $week ${get_time()} ${if (dnm) "denominator" else "numerator"}"
 
         // Handle changes in timetable (numerator/denominator, visibility)
@@ -378,9 +378,9 @@ class MainActivity : AppCompatActivity() {
             if (time_until_next_pair.length < 7) time_until_next_pair = "   $time_until_next_pair"
           }
         }
-        binding.LessonTextView.text =
+        binding.lessonTextView.text =
           "Lesson's time left: $lessons_time_left | Time until next lesson: $time_until_next_lesson"
-        binding.PairTextView.text =
+        binding.pairTextView.text =
           "Pair's time left:    $pairs_time_left | Time until next pair:      $time_until_next_pair"
 
         loop_handler.postDelayed(this, 10)

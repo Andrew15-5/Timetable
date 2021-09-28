@@ -18,7 +18,7 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/TimeAndWeek"
+                android:id="@+id/timeAndWeekTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/marginTop"
@@ -31,7 +31,7 @@
                 tools:ignore="Autofill,LabelFor" />
 
             <LinearLayout
-                android:id="@+id/SubjectsLayout"
+                android:id="@+id/subjectsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
@@ -40,7 +40,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/TimeLayout"
+                android:id="@+id/timeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -50,14 +50,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/OtherInfo"
+                android:id="@+id/otherInfoLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/LessonTextView"
+                    android:id="@+id/lessonTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
@@ -66,7 +66,7 @@
                     android:textSize="@dimen/textsize" />
 
                 <TextView
-                    android:id="@+id/PairTextView"
+                    android:id="@+id/pairTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
