@@ -23,7 +23,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
   private val TEXT_SIZE = 16F // 18F
 
-  private fun getTime(str: Any = "now", returnType: String = "string"): Any {
+  private fun get_time(str: Any = "now", return_type: String = "string"): Any {
     val h: Int
     val m: Int
     val s: Int
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         h = this.hour
         m = this.minute
         s = this.second
-        return when (returnType) {
+        return when (return_type) {
           "string" -> return "$h:${if (m < 10) "0" else ""}$m:${if (s < 10) "0" else ""}$s"
           "int" -> h * 3600 + m * 60 + s
           else -> arrayOf(h, m, s)
@@ -44,16 +44,16 @@ class MainActivity : AppCompatActivity() {
       m = this % 3600 / 60
       s = this % 60
     }
-    return when (returnType) {
+    return when (return_type) {
       "string" -> "${if (h != 0) "$h:" else ""}${if (m < 10) "0" else ""}$m:${if (s < 10) "0" else ""}$s"
       "int" -> str % 86400
       else -> arrayOf(h, m, s)
     }
   }
 
-  private fun createTextView(str: String, toSubjectLayout: Boolean = true): TextView {
-    val textView = TextView(this)
-    with(textView) {
+  private fun create_TextView(str: String, toSubjectLayout: Boolean = true): TextView {
+    val text_view = TextView(this)
+    with(text_view) {
       val width = RelativeLayout.LayoutParams.WRAP_CONTENT
       val height = RelativeLayout.LayoutParams.WRAP_CONTENT
       layoutParams = RelativeLayout.LayoutParams(width, height)
@@ -67,16 +67,16 @@ class MainActivity : AppCompatActivity() {
         else -> binding.TimeLayout.addView(this)
       }
     }
-    return textView
+    return text_view
   }
 
-  private fun createWeekDaySubjectTable(
-    textViewList: MutableList<TextView>,
+  private fun create_week_day_subject_table(
+    text_view_list: MutableList<TextView>,
     timetable_config: JSONObject,
     week_day: String
   ) {
     val subjects: JSONObject = timetable_config[week_day] as JSONObject
-    textViewList.add(createTextView(week_day))
+    text_view_list.add(create_TextView(week_day))
     for (lessons_order in subjects.keys()) {
       var subject = ""
       with(subjects[lessons_order]) {
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
 //          }
 //        }
       }
-      textViewList.add(createTextView("$lessons_order. $subject"))
+      text_view_list.add(create_TextView("$lessons_order. $subject"))
     }
   }
 
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     binding.SubjectsLayout.removeAllViews()
     timeTable.forEach { it.clear() }
     for (week_day in timetable_configs.config(config_index).keys().withIndex()) {
-      createWeekDaySubjectTable(
+      create_week_day_subject_table(
         timeTable[week_day.index],
         timetable_configs.current_config(),
         week_day.value
@@ -136,14 +136,14 @@ class MainActivity : AppCompatActivity() {
     val config_names = arrayOf("IMK4_3s.json", "IMK4_3s_custom.json")
 
     val timetable_configs = TimetableConfigs(assets, config_names, 1)
-    val timeTable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
-    repopulate_SubjectLayout(timetable_configs, timeTable)
+    val timetable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
+    repopulate_SubjectLayout(timetable_configs, timetable)
     binding.SubjectsLayout.setOnTouchListener { _, event ->
       when (event.action) {
         MotionEvent.ACTION_DOWN -> {
 //          val x = event.x.toInt()
 //          val y = event.y.toInt()
-          repopulate_SubjectLayout(timetable_configs, timeTable, TimetableConfigs.Config.NEXT)
+          repopulate_SubjectLayout(timetable_configs, timetable, TimetableConfigs.Config.NEXT)
         }
       }
       true
@@ -158,7 +158,7 @@ class MainActivity : AppCompatActivity() {
       64200, 66900, 67200, 69900
     )
 
-    val timePeriod = arrayOf(
+    val time_period = arrayOf(
       "8:30 - 9:15 | 9:20 -10:05",
       "10:05-10:20",
       "10:20-11:05 | 11:10-11:55",
@@ -173,11 +173,11 @@ class MainActivity : AppCompatActivity() {
     )
 
     val timeTimeTable = mutableListOf<TextView>()
-    for (line in timePeriod) {
-      timeTimeTable.add(createTextView(line, false))
+    for (line in time_period) {
+      timeTimeTable.add(create_TextView(line, false))
     }
 
-    fun studyTime(x: Int, y: Int = -1): Any {
+    fun study_time(x: Int, y: Int = -1): Any {
       if (y == -1 || y == 0) {
         if (x in timings[0] until timings[1]) return Pair(1, 1)
         else if (x in timings[2] until timings[3]) return Pair(1, 2)
@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
       return false
     }
 
-    fun breakTime(x: Int): Any {
+    fun break_time(x: Int): Any {
       return when (x) {
         in timings[1] until timings[2] -> 1
         in timings[3] until timings[4] -> 12
@@ -222,8 +222,8 @@ class MainActivity : AppCompatActivity() {
       }
     }
 
-    fun correctBreak(x: Int, y: Double): Boolean {
-      when (val ret = breakTime(x)) {
+    fun correct_break(x: Int, y: Double): Boolean {
+      when (val ret = break_time(x)) {
         false -> return false
         is Int -> return when {
           ret < 10 -> (ret - 0.5 == y)
@@ -236,8 +236,8 @@ class MainActivity : AppCompatActivity() {
     val calendar = Calendar.getInstance()
     // Some weeks of year are wrong if minimalDaysInFirstWeek is set to default
     calendar.minimalDaysInFirstWeek = 7
-    val loopHandler = Handler(Looper.getMainLooper())
-    loopHandler.post(object : Runnable {
+    val loop_handler = Handler(Looper.getMainLooper())
+    loop_handler.post(object : Runnable {
       override fun run() {
 
         fun set_calendar_date_for_today(calendar: Calendar) {
@@ -264,7 +264,7 @@ class MainActivity : AppCompatActivity() {
         val week = weeks_offset + 1
         val dnm = week % 2 == 0 // abbreviation for denominator
         binding.TimeAndWeek.text =
-          "week $week ${getTime()} ${if (dnm) "denominator" else "numerator"}"
+          "week $week ${get_time()} ${if (dnm) "denominator" else "numerator"}"
 
         // Handle changes in timetable (numerator/denominator, visibility)
         for (indexed_week_day in timetable_configs.current_config().keys().withIndex()) {
@@ -275,7 +275,7 @@ class MainActivity : AppCompatActivity() {
             val tmp = subjects[lessons_order]
             if (tmp !is JSONArray) continue
             val subject = tmp[if (dnm) 1 else 0]
-            val subject_text_view = timeTable[indexed_week_day.index][lessons_order.toInt()]
+            val subject_text_view = timetable[indexed_week_day.index][lessons_order.toInt()]
             when (subject) {
               "" -> subject_text_view.visibility = View.GONE
               else -> {
@@ -289,17 +289,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Color Timetable
-        val t = getTime("now", "int") as Int
-        for ((weekDay, Day) in timeTable.withIndex()) {
-          val defaultColor = (if (weekDay + 2 == current_day_of_week) yellow else green)
-          var color = defaultColor
+        val t = get_time("now", "int") as Int
+        for ((week_day, Day) in timetable.withIndex()) {
+          val default_color = (if (week_day + 2 == current_day_of_week) yellow else green)
+          var color = default_color
           for ((i, pair) in Day.withIndex()) {
             if (i == 0) {
               pair.setTextColor(getColor(color))
             } else {
               color = when {
-                weekDay + 2 == current_day_of_week && studyTime(t, (i - 1) * 2) is Pair<*, *> -> red
-                else -> defaultColor
+                week_day + 2 == current_day_of_week &&
+                        study_time(t, (i - 1) * 2) is Pair<*, *> -> red
+                else -> default_color
               }
               pair.setTextColor(getColor(color))
             }
@@ -307,82 +308,84 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Color Time
-        for (i in timePeriod.indices) {
-          var color = if (correctBreak(t, (i + 1) / 2.0)) yellow else green
-          if (studyTime(t, i) is Pair<*, *>) color = red
+        for (i in time_period.indices) {
+          var color = if (correct_break(t, (i + 1) / 2.0)) yellow else green
+          if (study_time(t, i) is Pair<*, *>) color = red
           timeTimeTable[i].setTextColor(getColor(color))
         }
 
-        val currentBreak = breakTime(t)
-        val currentPair = studyTime(t)
+        val current_break = break_time(t)
+        val current_pair = study_time(t)
         var index = -1
-        var otherTime = true
+        var other_time = true
         when {
-          currentPair is Pair<*, *> -> {
-            when (currentPair.second) {
-              1 -> index = (currentPair.first as Int - 1) * 4
-              2 -> index = (currentPair.first as Int - 1) * 4 + 2
+          current_pair is Pair<*, *> -> {
+            when (current_pair.second) {
+              1 -> index = (current_pair.first as Int - 1) * 4
+              2 -> index = (current_pair.first as Int - 1) * 4 + 2
             }
           }
-          currentBreak is Int -> {
+          current_break is Int -> {
             when {
-              currentBreak > 10 -> index = (currentBreak / 10 - 1) * 4 + 3
-              currentBreak < 10 -> index = (currentBreak - 1) * 4 + 1
+              current_break > 10 -> index = (current_break / 10 - 1) * 4 + 3
+              current_break < 10 -> index = (current_break - 1) * 4 + 1
             }
           }
         }
-        if (index != -1) otherTime = false
+        if (index != -1) other_time = false
 
 
-        var lessonsTimeLeft = ""
+        var lessons_time_left = ""
         when {
-          otherTime || index % 2 == 1 -> lessonsTimeLeft = "   --:--  "
-          index % 2 == 0 -> lessonsTimeLeft = getTime(timings[index + 1] - t) as String
+          other_time || index % 2 == 1 -> lessons_time_left = "   --:--  "
+          index % 2 == 0 -> lessons_time_left = get_time(timings[index + 1] - t) as String
         }
 
-        var timeUntilNextLesson: String
+        var time_until_next_lesson: String
         when {
-          otherTime || index > (timings.size - 3) -> {
-            timeUntilNextLesson = "     --:--"
-            if (otherTime && t < 30600) {
-              timeUntilNextLesson = getTime(timings[0] - t) as String
-              if (timeUntilNextLesson.length < 7) timeUntilNextLesson = "   $timeUntilNextLesson"
+          other_time || index > (timings.size - 3) -> {
+            time_until_next_lesson = "     --:--"
+            if (other_time && t < 30600) {
+              time_until_next_lesson = get_time(timings[0] - t) as String
+              if (time_until_next_lesson.length < 7) time_until_next_lesson =
+                "   $time_until_next_lesson"
             }
           }
           else -> {
-            timeUntilNextLesson = getTime(timings[index - index % 2 + 2] - t) as String
-            if (timeUntilNextLesson.length < 7) timeUntilNextLesson = "   $timeUntilNextLesson"
+            time_until_next_lesson = get_time(timings[index - index % 2 + 2] - t) as String
+            if (time_until_next_lesson.length < 7) time_until_next_lesson =
+              "   $time_until_next_lesson"
           }
         }
 
-        var pairsTimeLeft: String
+        var pairs_time_left: String
         when {
-          otherTime || index % 4 == 3 -> pairsTimeLeft = "      --:--  "
+          other_time || index % 4 == 3 -> pairs_time_left = "      --:--  "
           else -> {
-            pairsTimeLeft = getTime(timings[index - index % 4 + 3] - t) as String
-            if (pairsTimeLeft.length < 7) pairsTimeLeft = "   $pairsTimeLeft"
+            pairs_time_left = get_time(timings[index - index % 4 + 3] - t) as String
+            if (pairs_time_left.length < 7) pairs_time_left = "   $pairs_time_left"
           }
         }
-        var timeUntilNextPair: String
+        var time_until_next_pair: String
         when {
-          otherTime || index > (timings.size - 5) -> {
-            timeUntilNextPair = "     --:--"
-            if (otherTime && t < 30600) {
-              timeUntilNextPair = getTime(timings[0] - t) as String
-              if (timeUntilNextPair.length < 7) timeUntilNextPair = "   $timeUntilNextPair"
+          other_time || index > (timings.size - 5) -> {
+            time_until_next_pair = "     --:--"
+            if (other_time && t < 30600) {
+              time_until_next_pair = get_time(timings[0] - t) as String
+              if (time_until_next_pair.length < 7) time_until_next_pair = "   $time_until_next_pair"
             }
           }
           else -> {
-            timeUntilNextPair = getTime(timings[index - index % 4 + 4] - t) as String
-            if (timeUntilNextPair.length < 7) timeUntilNextPair = "   $timeUntilNextPair"
+            time_until_next_pair = get_time(timings[index - index % 4 + 4] - t) as String
+            if (time_until_next_pair.length < 7) time_until_next_pair = "   $time_until_next_pair"
           }
         }
         binding.LessonTextView.text =
-          "Lesson's time left: $lessonsTimeLeft | Time until next lesson: $timeUntilNextLesson"
+          "Lesson's time left: $lessons_time_left | Time until next lesson: $time_until_next_lesson"
         binding.PairTextView.text =
-          "Pair's time left:    $pairsTimeLeft | Time until next pair:      $timeUntilNextPair"
+          "Pair's time left:    $pairs_time_left | Time until next pair:      $time_until_next_pair"
 
-        loopHandler.postDelayed(this, 10)
+        loop_handler.postDelayed(this, 10)
       }
     })
   }
