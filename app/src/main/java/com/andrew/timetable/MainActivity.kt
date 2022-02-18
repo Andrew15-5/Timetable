@@ -330,13 +330,11 @@ class MainActivity : AppCompatActivity() {
         }
         if (index != -1) other_time = false
 
-
         var lessons_time_left = ""
         when {
           other_time || index % 2 == 1 -> lessons_time_left = "   --:--  "
           index % 2 == 0 -> lessons_time_left = get_time(timings[index + 1] - t) as String
         }
-
         var time_until_next_lesson: String
         when {
           other_time || index > (timings.size - 3) -> {
