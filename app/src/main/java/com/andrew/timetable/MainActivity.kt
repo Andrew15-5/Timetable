@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.andrew.timetable.R.color.*
 import com.andrew.timetable.databinding.ActivityMainBinding
-import com.jakewharton.threetenabp.AndroidThreeTen
 import org.json.JSONArray
 import org.json.JSONObject
 import org.threeten.bp.LocalDate
@@ -111,7 +110,6 @@ class MainActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    AndroidThreeTen.init(this)
     binding = ActivityMainBinding.inflate(layoutInflater)
     val view = binding.root
     setContentView(view)
