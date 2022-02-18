@@ -182,7 +182,7 @@ class MainActivity : AppCompatActivity() {
     //   no nth subject on numerator week, "Denominator subject" on denominator subject
     // 3.2) ["Numerator subject", ""] -
     //   "Numerator subject" on numerator subject, no nth subject on denominator week
-    val config_names = arrayOf("IMK4_3s.json", "IMK4_3s_custom.json")
+    val config_names = arrayOf("IMK4_4s.json", "IMK4_4s_custom.json")
 
     val timetable_configs = TimetableConfigs(assets, config_names, 1)
     val timetable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
