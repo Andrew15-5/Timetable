@@ -15,8 +15,12 @@ import com.andrew.timetable.R.color.*
 import com.andrew.timetable.databinding.ActivityMainBinding
 import org.json.JSONArray
 import org.json.JSONObject
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.Month
+import org.threeten.bp.temporal.TemporalAdjusters
+import org.threeten.bp.temporal.WeekFields
 import java.util.*
 
 
@@ -104,6 +108,55 @@ class MainActivity : AppCompatActivity() {
       )
     }
   }
+
+
+  fun get_start_date_of_current_semester(
+    year: Int, month: Int
+  ): LocalDate {
+    val first_monday_of_february: Int = LocalDate.of(year, Month.FEBRUARY, 1)
+      .with(TemporalAdjusters.dayOfWeekInMonth(1, DayOfWeek.MONDAY))
+      .dayOfMonth
+    return if (month >= Month.SEPTEMBER.value) { // 1st semester in the academic year
+      LocalDate.of(year, Month.SEPTEMBER, 1)
+    } else { // Get the beginning of the 2nd week of February (2nd semester in the academic year)
+      if (first_monday_of_february == 1) {
+        LocalDate.of(year, Month.FEBRUARY, 8)
+      } else {
+        LocalDate.of(year, Month.FEBRUARY, first_monday_of_february)
+      }
+    }
+  }
+
+  fun get_start_date_of_current_semester(calendar: Calendar): LocalDate {
+    return get_start_date_of_current_semester(
+      calendar[Calendar.YEAR],
+      calendar[Calendar.MONTH] + 1
+    )
+  }
+
+  /**
+   * This is the only one method of getting week of year that works correctly (made test for it).
+   * Range of return value is from 1 to 53 (both included).
+   */
+  fun get_week_of_year(year: Int, month: Int, day: Int): Int {
+    val week_of_year = WeekFields.of(DayOfWeek.MONDAY, 1).weekOfYear()
+    val date = LocalDate.of(year, month, day)
+    return date.get(week_of_year)
+  }
+
+
+  fun get_week_of_year(date: LocalDate): Int {
+    return get_week_of_year(date.year, date.monthValue, date.dayOfMonth)
+  }
+
+  fun get_week_of_year(calendar: Calendar): Int {
+    return get_week_of_year(
+      calendar[Calendar.YEAR],
+      calendar[Calendar.MONTH] + 1,
+      calendar[Calendar.DAY_OF_MONTH]
+    )
+  }
+
 
   private lateinit var binding: ActivityMainBinding
 
@@ -230,8 +283,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     val calendar = Calendar.getInstance()
-    // Some weeks of year are wrong if minimalDaysInFirstWeek is set to default
-    calendar.minimalDaysInFirstWeek = 7
     val loop_handler = Handler(Looper.getMainLooper())
     loop_handler.post(object : Runnable {
       override fun run() {
@@ -242,25 +293,26 @@ class MainActivity : AppCompatActivity() {
           calendar.set(current_date.year, current_date.monthValue - 1, current_date.dayOfMonth)
         }
 
-        fun set_calendar_date(calendar: Calendar, year: Int, month: Int, day: Int) {
-          // Note: month count in Calendar starts with 0 for JANUARY
-          calendar.set(year, month - 1, day)
-        }
-
         set_calendar_date_for_today(calendar)
         val current_day_of_week = calendar.get(Calendar.DAY_OF_WEEK) // For coloring
         val current_year = calendar.get(Calendar.YEAR)
-        val current_week_of_year = calendar.get(Calendar.WEEK_OF_YEAR)
+        val current_week_of_year = get_week_of_year(calendar)
 
-        set_calendar_date(calendar, current_year, 9, 1)
-        val first_week_of_academic_year = calendar.get(Calendar.WEEK_OF_YEAR)
+        val start_date_of_current_semester = get_start_date_of_current_semester(calendar)
+        val first_week_of_semester = get_week_of_year(start_date_of_current_semester)
 
-        val weeks_offset = current_week_of_year - first_week_of_academic_year
-        // Note: week starts with Sunday -> timetable and week parity will change on Sunday
-        val week = weeks_offset + 1
-        val dnm = week % 2 == 0 // abbreviation for denominator
+        val weeks_offset = current_week_of_year - first_week_of_semester
+        // Note: timetable and week parity is changing every Sunday
+        val week = 1 + weeks_offset + if (current_day_of_week == Calendar.SUNDAY) 1 else 0
+        var dnm = week % 2 == 0 // Abbreviation for denominator
+
+        // Starting from 11th week (only in 3rd semester) week parity is swapped
+        if (current_year == 2021 && week >= 11) {
+          dnm = !dnm
+        }
+
         binding.timeAndWeekTextView.text =
-          "week $week ${get_time()} ${if (dnm) "denominator" else "numerator"}"
+          "week ${if (week in 1..17) week else "18+"} ${get_time()} ${if (dnm) "denominator" else "numerator"}"
 
         // Handle changes in timetable (numerator/denominator, visibility)
         for (indexed_week_day in timetable_configs.current_config().keys().withIndex()) {
