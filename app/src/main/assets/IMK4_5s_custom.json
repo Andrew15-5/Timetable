@@ -1,0 +1,32 @@
+{
+  "Monday": {
+    "1": ["Databases 5-219 (ex)", ""],
+    "2": "Databases 5-219 (lab) II",
+    "3": "Operating Systems 5-226 (lab) II",
+    "4": "PE 2"
+  },
+  "Tuesday": {
+    "1": "Operating Systems 5-108 (lecture)",
+    "2": "PPL 5-108 (lecture)",
+    "3": ["FoIC 5-155 (ex)", ""]
+  },
+  "Wednesday": {
+    "1": ["FoIC 1-213 (lecture)", "Probability Theory 7-404 (ex)"],
+    "2": "English 1 (ex)",
+    "3": "Probability Theory 7-504 (lecture)",
+    "4": "PE 2"
+  },
+  "Thursday": {
+  },
+  "Friday": {
+    "1": "Expert Systems 5-222 (lab) II",
+    "2": "PPL 5-231 (lab) II",
+    "3": "Databases 5-108 (lecture)",
+    "4": "Object-Oriented Programming 5-? (?)"
+  },
+  "Saturday": {
+    "1": "Expert Systems 5-108 (lecture)",
+    "2": "Probability Theory 5-155 (ex)",
+    "3": "Research Work 5-?"
+  }
+}
