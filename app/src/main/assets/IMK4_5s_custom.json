@@ -1,6 +1,6 @@
 {
   "Monday": {
-    "1": ["Databases 5-219 (ex)", ""],
+    "1": ["Databases 5-219 (ex)", "-"],
     "2": "Databases 5-219 (lab) II",
     "3": "Operating Systems 5-226 (lab) II",
     "4": "PE 2"
@@ -19,7 +19,7 @@
   "Thursday": {
   },
   "Friday": {
-    "1": "Expert Systems 5-222 (lab) II",
+    "1": "Expert Systems 5-222a (lab) II",
     "2": "PPL 5-231 (lab) II",
     "3": "Databases 5-108 (lecture)",
     "4": "Object-Oriented Programming 5-? (?)"

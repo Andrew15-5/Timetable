@@ -1,6 +1,6 @@
 {
   "Monday": {
-    "1": ["Databases 5-219 (ex)", ""],
+    "1": ["Databases 5-219 (ex)", "-"],
     "2": "OSs 5-226 (lab) I / DBs 5-219 (lab) II",
     "3": "DBs 5-219 (lab) I / OSs 5-226 (lab) II",
     "4": "PE 2"
@@ -19,8 +19,8 @@
   "Thursday": {
   },
   "Friday": {
-    "1": "PPL 5-231 (lab) I / ESs 5-222 (lab) II",
-    "2": "ESs 5-222 (lab) I / PPL 5-231 (lab) II",
+    "1": "PPL 5-231 (lab) I / ESs 5-222a (lab) II",
+    "2": "ESs 5-222a (lab) I / PPL 5-231 (lab) II",
     "3": "Databases 5-108 (lecture)",
     "4": "Object-Oriented Programming 5-? (?)"
   },
