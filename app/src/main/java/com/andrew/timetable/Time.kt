@@ -47,7 +47,7 @@ class Time private constructor(duration: Duration) {
    * Checks if from <= time < until
    */
   fun from_until(from: Time, until: Time): Boolean {
-    return (from <= this) and (this < until)
+    return from <= this && this < until
   }
 
   fun full_format(): String {

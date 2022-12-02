@@ -1,8 +1,6 @@
 package com.andrew.timetable
 
 import android.content.res.AssetManager
-import com.andrew.timetable.TimetableConfigs.Config.CURRENT
-import com.andrew.timetable.TimetableConfigs.Config.NEXT
 import org.json.JSONObject
 
 class TimetableConfigs(
@@ -35,7 +33,7 @@ class TimetableConfigs(
 
   fun get_config(which_one: Config): JSONObject {
     return when {
-      which_one === NEXT -> get_next_config()
+      which_one === Config.NEXT -> get_next_config()
       else -> get_current_config()
     }
   }
