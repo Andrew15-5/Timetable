@@ -69,10 +69,10 @@ class MainActivity : AppCompatActivity() {
   ) {
     binding.subjectsLayout.removeAllViews()
     timeTable.forEach { it.clear() }
-    for (week_day in timetable_configs.config(config_index).keys().withIndex()) {
+    for (week_day in timetable_configs.get_config(config_index).keys().withIndex()) {
       create_week_day_subject_table(
         timeTable[week_day.index],
-        timetable_configs.current_config(),
+        timetable_configs.get_current_config(),
         week_day.value
       )
     }
@@ -290,8 +290,9 @@ class MainActivity : AppCompatActivity() {
         binding.timeAndWeekTextView.text = "week $current_week $current_time $week_parity"
 
         // Handle changes in timetable (numerator/denominator, visibility)
-        for (indexed_week_day in timetable_configs.current_config().keys().withIndex()) {
-          val subjects = timetable_configs.current_config()[indexed_week_day.value] as JSONObject
+        for (indexed_week_day in timetable_configs.get_current_config().keys().withIndex()) {
+          val subjects =
+            timetable_configs.get_current_config()[indexed_week_day.value] as JSONObject
           for (lessons_order in subjects.keys()) {
             // tmp is either a String or JSONArray with size 2
             // Example: either "subject name" or ["numerator subject", "denominator subject"]
