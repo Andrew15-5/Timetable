@@ -17,7 +17,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-
 class MainActivity : AppCompatActivity() {
   private val TEXT_SIZE = 16F // 18F
   private val utils = Utils()
@@ -26,7 +25,10 @@ class MainActivity : AppCompatActivity() {
 
   private lateinit var binding: ActivityMainBinding
 
-  private fun create_TextView(str: String, parent_layout: ViewGroup): TextView {
+  private fun create_TextView(
+    text: String,
+    parent_layout: ViewGroup
+  ): TextView {
     val text_view = TextView(this)
     with(text_view) {
       val width = RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -36,7 +38,7 @@ class MainActivity : AppCompatActivity() {
       includeFontPadding = false
       textSize = TEXT_SIZE
       textAlignment = View.TEXT_ALIGNMENT_CENTER
-      text = str
+      this.text = text
       parent_layout.addView(this)
     }
     return text_view
@@ -125,9 +127,9 @@ class MainActivity : AppCompatActivity() {
       true
     }
 
-    val timeTimeTable = mutableListOf<TextView>()
+    val timetable_for_time_periods = mutableListOf<TextView>()
     for (line in time_periods) {
-      timeTimeTable.add(create_TextView(line, binding.timeLayout))
+      timetable_for_time_periods += create_TextView(line, binding.timeLayout)
     }
 
     val calendar = Calendar.getInstance()
@@ -224,7 +226,7 @@ class MainActivity : AppCompatActivity() {
             utils.study_time(current_time, i) is Pair<*, *> -> red
             else -> green
           }
-          timeTimeTable[i].setTextColor(getColor(color))
+          timetable_for_time_periods[i].setTextColor(getColor(color))
         }
 
         val current_break = utils.break_time(current_time)
@@ -251,6 +253,7 @@ class MainActivity : AppCompatActivity() {
           other_time || index % 2 == 1 -> "   --:--  "
           else -> timings[index + 1].minus(current_time).short_format()
         }
+
         val time_until_next_lesson = when {
           other_time || index > (timings.size - 3) -> {
             when {
@@ -268,6 +271,7 @@ class MainActivity : AppCompatActivity() {
           else -> timings[index - index % 4 + 3]
             .minus(current_time).short_format()
         }
+
         val time_until_next_pair = when {
           other_time || index > (timings.size - 5) -> {
             when {
@@ -279,9 +283,11 @@ class MainActivity : AppCompatActivity() {
           else -> timings[index - index % 4 + 4]
             .minus(current_time).short_format()
         }
+
         binding.lessonTextView.text =
           "Lesson's time left: $lessons_time_left |" +
                   " Time until next lesson: $time_until_next_lesson"
+
         binding.pairTextView.text =
           "Pair's time left:    $pairs_time_left |" +
                   " Time until next pair:      $time_until_next_pair"
