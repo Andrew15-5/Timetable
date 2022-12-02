@@ -3,13 +3,13 @@ plugins {
     id "kotlin-android"
 }
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.andrew.timetable"
         minSdkVersion 24
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 14
         versionName "0.3.5"
 
