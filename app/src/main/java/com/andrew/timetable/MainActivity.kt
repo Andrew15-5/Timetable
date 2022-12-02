@@ -206,48 +206,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun study_time(x: Time, y: Int = -1): Any {
-      var i = 0
       if (y == -1 || y == 0) {
-        if (x.from_until(timings[i++], timings[i++])) return Pair(1, 1)
-        else if (x.from_until(timings[i++], timings[i++])) return Pair(1, 2)
+        if (x.from_until(timings[0], timings[1])) return Pair(1, 1)
+        else if (x.from_until(timings[2], timings[3])) return Pair(1, 2)
       }
       if (y == -1 || y == 2) {
-        if (x.from_until(timings[i++], timings[i++])) return Pair(2, 1)
-        else if (x.from_until(timings[i++], timings[i++])) return Pair(2, 2)
+        if (x.from_until(timings[4], timings[5])) return Pair(2, 1)
+        else if (x.from_until(timings[6], timings[7])) return Pair(2, 2)
       }
       if (y == -1 || y == 4) {
-        if (x.from_until(timings[i++], timings[i++])) return Pair(3, 1)
-        else if (x.from_until(timings[i++], timings[i++])) return Pair(3, 2)
+        if (x.from_until(timings[8], timings[9])) return Pair(3, 1)
+        else if (x.from_until(timings[10], timings[11])) return Pair(3, 2)
       }
       if (y == -1 || y == 6) {
-        if (x.from_until(timings[i++], timings[i++])) return Pair(4, 1)
-        else if (x.from_until(timings[i++], timings[i++])) return Pair(4, 2)
+        if (x.from_until(timings[12], timings[13])) return Pair(4, 1)
+        else if (x.from_until(timings[14], timings[15])) return Pair(4, 2)
       }
       if (y == -1 || y == 8) {
-        if (x.from_until(timings[i++], timings[i++])) return Pair(5, 1)
-        else if (x.from_until(timings[i++], timings[i++])) return Pair(5, 2)
+        if (x.from_until(timings[16], timings[17])) return Pair(5, 1)
+        else if (x.from_until(timings[18], timings[19])) return Pair(5, 2)
       }
       if (y == -1 || y == 10) {
-        if (x.from_until(timings[i++], timings[i++])) return Pair(6, 1)
-        else if (x.from_until(timings[i++], timings[i++])) return Pair(6, 2)
+        if (x.from_until(timings[20], timings[21])) return Pair(6, 1)
+        else if (x.from_until(timings[22], timings[23])) return Pair(6, 2)
       }
       return false
     }
 
     fun break_time(x: Time): Any {
-      var i = 1
       return when {
-        x.from_until(timings[i++], timings[i++]) -> 1
-        x.from_until(timings[i++], timings[i++]) -> 12
-        x.from_until(timings[i++], timings[i++]) -> 2
-        x.from_until(timings[i++], timings[i++]) -> 23
-        x.from_until(timings[i++], timings[i++]) -> 3
-        x.from_until(timings[i++], timings[i++]) -> 34
-        x.from_until(timings[i++], timings[i++]) -> 4
-        x.from_until(timings[i++], timings[i++]) -> 45
-        x.from_until(timings[i++], timings[i++]) -> 5
-        x.from_until(timings[i++], timings[i++]) -> 56
-        x.from_until(timings[i++], timings[i++]) -> 6
+        x.from_until(timings[1], timings[2]) -> 1
+        x.from_until(timings[3], timings[4]) -> 12
+        x.from_until(timings[5], timings[6]) -> 2
+        x.from_until(timings[7], timings[8]) -> 23
+        x.from_until(timings[9], timings[10]) -> 3
+        x.from_until(timings[11], timings[12]) -> 34
+        x.from_until(timings[13], timings[14]) -> 4
+        x.from_until(timings[15], timings[16]) -> 45
+        x.from_until(timings[17], timings[18]) -> 5
+        x.from_until(timings[19], timings[20]) -> 56
+        x.from_until(timings[21], timings[22]) -> 6
         else -> false
       }
     }
