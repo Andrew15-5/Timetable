@@ -15,10 +15,7 @@ import com.andrew.timetable.R.color.*
 import com.andrew.timetable.databinding.ActivityMainBinding
 import org.json.JSONArray
 import org.json.JSONObject
-import org.threeten.bp.DayOfWeek
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.Month
+import org.threeten.bp.*
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.WeekFields
 import java.util.*
@@ -26,34 +23,6 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
   private val TEXT_SIZE = 16F // 18F
-
-  private fun get_time(str: Any = "now", return_type: String = "string"): Any {
-    val h: Int
-    val m: Int
-    val s: Int
-    if (str == "now") {
-      with(LocalDateTime.now()) {
-        h = this.hour
-        m = this.minute
-        s = this.second
-        return when (return_type) {
-          "string" -> return "$h:${if (m < 10) "0" else ""}$m:${if (s < 10) "0" else ""}$s"
-          "int" -> h * 3600 + m * 60 + s
-          else -> arrayOf(h, m, s)
-        }
-      }
-    }
-    with(str as Int) {
-      h = this / 3600 % 24
-      m = this % 3600 / 60
-      s = this % 60
-    }
-    return when (return_type) {
-      "string" -> "${if (h != 0) "$h:" else ""}${if (m < 10) "0" else ""}$m:${if (s < 10) "0" else ""}$s"
-      "int" -> str % 86400
-      else -> arrayOf(h, m, s)
-    }
-  }
 
   private fun create_TextView(str: String, parent_layout: ViewGroup): TextView {
     val text_view = TextView(this)
@@ -198,14 +167,15 @@ class MainActivity : AppCompatActivity() {
       true
     }
 
-    val timings = arrayOf(
-      30600, 33300, 33600, 36300,
-      37200, 39900, 40200, 42900,
-      43800, 46500, 46800, 49500,
-      51300, 54000, 54300, 57000,
-      57900, 60600, 60900, 63600,
-      64200, 66900, 67200, 69900
-    )
+    val timings = mutableListOf<Time>()
+    arrayOf(
+      "8:30", "9:15", "9:20", "10:05",
+      "10:20", "11:05", "11:10", "11:55",
+      "12:10", "12:55", "13:00", "13:45",
+      "14:15", "15:00", "15:05", "15:50",
+      "16:05", "15:50", "16:55", "17:40",
+      "17:50", "18:35", "18:40", "19:25"
+    ).forEach { time -> timings += Time.from_hhmm(time) }
 
     val time_period = arrayOf(
       "8:30 - 9:15 | 9:20 -10:05",
@@ -226,52 +196,54 @@ class MainActivity : AppCompatActivity() {
       timeTimeTable.add(create_TextView(line, binding.timeLayout))
     }
 
-    fun study_time(x: Int, y: Int = -1): Any {
+    fun study_time(x: Time, y: Int = -1): Any {
+      var i = 0
       if (y == -1 || y == 0) {
-        if (x in timings[0] until timings[1]) return Pair(1, 1)
-        else if (x in timings[2] until timings[3]) return Pair(1, 2)
+        if (x.from_until(timings[i++], timings[i++])) return Pair(1, 1)
+        else if (x.from_until(timings[i++], timings[i++])) return Pair(1, 2)
       }
       if (y == -1 || y == 2) {
-        if (x in timings[4] until timings[5]) return Pair(2, 1)
-        else if (x in timings[6] until timings[7]) return Pair(2, 2)
+        if (x.from_until(timings[i++], timings[i++])) return Pair(2, 1)
+        else if (x.from_until(timings[i++], timings[i++])) return Pair(2, 2)
       }
       if (y == -1 || y == 4) {
-        if (x in timings[8] until timings[9]) return Pair(3, 1)
-        else if (x in timings[10] until timings[11]) return Pair(3, 2)
+        if (x.from_until(timings[i++], timings[i++])) return Pair(3, 1)
+        else if (x.from_until(timings[i++], timings[i++])) return Pair(3, 2)
       }
       if (y == -1 || y == 6) {
-        if (x in timings[12] until timings[13]) return Pair(4, 1)
-        else if (x in timings[14] until timings[15]) return Pair(4, 2)
+        if (x.from_until(timings[i++], timings[i++])) return Pair(4, 1)
+        else if (x.from_until(timings[i++], timings[i++])) return Pair(4, 2)
       }
       if (y == -1 || y == 8) {
-        if (x in timings[16] until timings[17]) return Pair(5, 1)
-        else if (x in timings[18] until timings[19]) return Pair(5, 2)
+        if (x.from_until(timings[i++], timings[i++])) return Pair(5, 1)
+        else if (x.from_until(timings[i++], timings[i++])) return Pair(5, 2)
       }
       if (y == -1 || y == 10) {
-        if (x in timings[20] until timings[21]) return Pair(6, 1)
-        else if (x in timings[22] until timings[23]) return Pair(6, 2)
+        if (x.from_until(timings[i++], timings[i++])) return Pair(6, 1)
+        else if (x.from_until(timings[i++], timings[i++])) return Pair(6, 2)
       }
       return false
     }
 
-    fun break_time(x: Int): Any {
-      return when (x) {
-        in timings[1] until timings[2] -> 1
-        in timings[3] until timings[4] -> 12
-        in timings[5] until timings[6] -> 2
-        in timings[7] until timings[8] -> 23
-        in timings[9] until timings[10] -> 3
-        in timings[11] until timings[12] -> 34
-        in timings[13] until timings[14] -> 4
-        in timings[15] until timings[16] -> 45
-        in timings[17] until timings[18] -> 5
-        in timings[19] until timings[20] -> 56
-        in timings[21] until timings[22] -> 6
+    fun break_time(x: Time): Any {
+      var i = 1
+      return when {
+        x.from_until(timings[i++], timings[i++]) -> 1
+        x.from_until(timings[i++], timings[i++]) -> 12
+        x.from_until(timings[i++], timings[i++]) -> 2
+        x.from_until(timings[i++], timings[i++]) -> 23
+        x.from_until(timings[i++], timings[i++]) -> 3
+        x.from_until(timings[i++], timings[i++]) -> 34
+        x.from_until(timings[i++], timings[i++]) -> 4
+        x.from_until(timings[i++], timings[i++]) -> 45
+        x.from_until(timings[i++], timings[i++]) -> 5
+        x.from_until(timings[i++], timings[i++]) -> 56
+        x.from_until(timings[i++], timings[i++]) -> 6
         else -> false
       }
     }
 
-    fun correct_break(x: Int, y: Double): Boolean {
+    fun correct_break(x: Time, y: Double): Boolean {
       when (val ret = break_time(x)) {
         false -> return false
         is Int -> return when {
@@ -311,8 +283,11 @@ class MainActivity : AppCompatActivity() {
           dnm = !dnm
         }
 
-        binding.timeAndWeekTextView.text =
-          "week ${if (week in 1..17) week else "18+"} ${get_time()} ${if (dnm) "denominator" else "numerator"}"
+        val current_time = Time.now().full_format()
+        val week_parity = if (dnm) "denominator" else "numerator"
+        val last_week = 17
+        val current_week = if (week in 1..last_week) week else "18+"
+        binding.timeAndWeekTextView.text = "week $current_week $current_time $week_parity"
 
         // Handle changes in timetable (numerator/denominator, visibility)
         for (indexed_week_day in timetable_configs.current_config().keys().withIndex()) {
@@ -337,7 +312,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Color Timetable
-        val t = get_time("now", "int") as Int
+        val t = Time.now()
         for ((week_day, Day) in timetable.withIndex()) {
           val default_color = (if (week_day + 2 == current_day_of_week) yellow else green)
           var color = default_color
@@ -382,49 +357,32 @@ class MainActivity : AppCompatActivity() {
         }
         if (index != -1) other_time = false
 
-        var lessons_time_left = ""
-        when {
-          other_time || index % 2 == 1 -> lessons_time_left = "   --:--  "
-          index % 2 == 0 -> lessons_time_left = get_time(timings[index + 1] - t) as String
+        val lessons_time_left = when {
+          other_time || index % 2 == 1 -> "   --:--  "
+          else -> timings[index + 1].minus(t).short_format()
         }
-        var time_until_next_lesson: String
-        when {
+        val time_until_next_lesson = when {
           other_time || index > (timings.size - 3) -> {
-            time_until_next_lesson = "     --:--"
-            if (other_time && t < 30600) {
-              time_until_next_lesson = get_time(timings[0] - t) as String
-              if (time_until_next_lesson.length < 7) time_until_next_lesson =
-                "   $time_until_next_lesson"
+            when {
+              other_time && t < timings[0] -> timings[0].minus(t).short_format()
+              else -> "     --:--"
             }
           }
-          else -> {
-            time_until_next_lesson = get_time(timings[index - index % 2 + 2] - t) as String
-            if (time_until_next_lesson.length < 7) time_until_next_lesson =
-              "   $time_until_next_lesson"
-          }
+          else -> timings[index - index % 2 + 2].minus(t).short_format()
         }
 
-        var pairs_time_left: String
-        when {
-          other_time || index % 4 == 3 -> pairs_time_left = "      --:--  "
-          else -> {
-            pairs_time_left = get_time(timings[index - index % 4 + 3] - t) as String
-            if (pairs_time_left.length < 7) pairs_time_left = "   $pairs_time_left"
-          }
+        val pairs_time_left = when {
+          other_time || index % 4 == 3 -> "      --:--  "
+          else -> timings[index - index % 4 + 3].minus(t).short_format()
         }
-        var time_until_next_pair: String
-        when {
+        val time_until_next_pair = when {
           other_time || index > (timings.size - 5) -> {
-            time_until_next_pair = "     --:--"
-            if (other_time && t < 30600) {
-              time_until_next_pair = get_time(timings[0] - t) as String
-              if (time_until_next_pair.length < 7) time_until_next_pair = "   $time_until_next_pair"
+            when {
+              other_time && t < timings[0] -> timings[0].minus(t).short_format()
+              else -> "     --:--"
             }
           }
-          else -> {
-            time_until_next_pair = get_time(timings[index - index % 4 + 4] - t) as String
-            if (time_until_next_pair.length < 7) time_until_next_pair = "   $time_until_next_pair"
-          }
+          else -> timings[index - index % 4 + 4].minus(t).short_format()
         }
         binding.lessonTextView.text =
           "Lesson's time left: $lessons_time_left | Time until next lesson: $time_until_next_lesson"
