@@ -58,7 +58,9 @@ class MainActivity : AppCompatActivity() {
 //          }
 //        }
       }
-      text_view_list.add(create_TextView("$lessons_order. $subject", binding.subjectsLayout))
+      text_view_list += create_TextView(
+        "$lessons_order. $subject", binding.subjectsLayout
+      )
     }
   }
 
@@ -69,7 +71,8 @@ class MainActivity : AppCompatActivity() {
   ) {
     binding.subjectsLayout.removeAllViews()
     timeTable.forEach { it.clear() }
-    for (week_day in timetable_configs.get_config(config_index).keys().withIndex()) {
+    for (week_day in
+    timetable_configs.get_config(config_index).keys().withIndex()) {
       create_week_day_subject_table(
         timeTable[week_day.index],
         timetable_configs.get_current_config(),
@@ -79,19 +82,21 @@ class MainActivity : AppCompatActivity() {
   }
 
 
-  fun get_start_date_of_current_semester(
-    year: Int, month: Int
-  ): LocalDate {
-    val first_monday_of_february: Int = LocalDate.of(year, Month.FEBRUARY, 1)
-      .with(TemporalAdjusters.dayOfWeekInMonth(1, DayOfWeek.MONDAY))
-      .dayOfMonth
-    return if (month >= Month.SEPTEMBER.value) { // 1st semester in the academic year
-      LocalDate.of(year, Month.SEPTEMBER, 1)
-    } else { // Get the beginning of the 2nd week of February (2nd semester in the academic year)
-      if (first_monday_of_february == 1) {
-        LocalDate.of(year, Month.FEBRUARY, 8)
-      } else {
-        LocalDate.of(year, Month.FEBRUARY, first_monday_of_february)
+  fun get_start_date_of_current_semester(year: Int, month: Int): LocalDate {
+    val first_monday_of_february = LocalDate.of(year, Month.FEBRUARY, 1)
+      .with(TemporalAdjusters.dayOfWeekInMonth(1, DayOfWeek.MONDAY)).dayOfMonth
+    return when {
+      month >= Month.SEPTEMBER.value -> {
+        // 1st semester in the academic year
+        LocalDate.of(year, Month.SEPTEMBER, 1)
+      }
+      else -> {
+        // 2nd semester in the academic year
+        // Get the beginning of the 2nd week of February ()
+        when (first_monday_of_february) {
+          1 -> LocalDate.of(year, Month.FEBRUARY, 8)
+          else -> LocalDate.of(year, Month.FEBRUARY, first_monday_of_february)
+        }
       }
     }
   }
@@ -143,14 +148,16 @@ class MainActivity : AppCompatActivity() {
     )
 
     // JSON nth subject values:
-    // 1) "Subject" -
-    //   same "Subject" every week
-    // 2) ["Numerator subject", "Denominator subject"] -
-    //   "Numerator subject" on numerator week, "Denominator subject" on denominator week
-    // 3.1) ["", "Denominator subject"] -
-    //   no nth subject on numerator week, "Denominator subject" on denominator subject
-    // 3.2) ["Numerator subject", ""] -
-    //   "Numerator subject" on numerator subject, no nth subject on denominator week
+    // 1. "Subject" - same "Subject" every week
+    // 2. ["Numerator subject", "Denominator subject"] -
+    //    "Numerator subject" on numerator week,
+    //    "Denominator subject" on denominator week
+    // 3.1. ["", "Denominator subject"] -
+    //      no nth subject on numerator week,
+    //      "Denominator subject" on denominator week
+    // 3.2. ["Numerator subject", ""] -
+    //      "Numerator subject" on numerator week,
+    //      no nth subject on denominator week
     val config_names = arrayOf("IMK4_5s.json", "IMK4_5s_custom.json")
 
     val timetable_configs = TimetableConfigs(assets, config_names, 1)
@@ -161,7 +168,9 @@ class MainActivity : AppCompatActivity() {
         MotionEvent.ACTION_DOWN -> {
 //          val x = event.x.toInt()
 //          val y = event.y.toInt()
-          repopulate_SubjectLayout(timetable_configs, timetable, TimetableConfigs.Config.NEXT)
+          repopulate_SubjectLayout(
+            timetable_configs, timetable, TimetableConfigs.Config.NEXT
+          )
         }
       }
       true
@@ -262,20 +271,30 @@ class MainActivity : AppCompatActivity() {
         fun set_calendar_date_for_today(calendar: Calendar) {
           val current_date = LocalDate.now()
           // Note: month count in Calendar starts with 0 for JANUARY
-          calendar.set(current_date.year, current_date.monthValue - 1, current_date.dayOfMonth)
+          calendar.set(
+            current_date.year,
+            current_date.monthValue - 1,
+            current_date.dayOfMonth
+          )
         }
 
         set_calendar_date_for_today(calendar)
-        val current_day_of_week = calendar.get(Calendar.DAY_OF_WEEK) // For coloring
+
+        // Note: Sunday = 1 .. Saturday = 7
+        val current_day_of_week = calendar.get(Calendar.DAY_OF_WEEK)
         val current_year = calendar.get(Calendar.YEAR)
         val current_week_of_year = get_week_of_year(calendar)
 
-        val start_date_of_current_semester = get_start_date_of_current_semester(calendar)
-        val first_week_of_semester = get_week_of_year(start_date_of_current_semester)
+        val start_date_of_current_semester =
+          get_start_date_of_current_semester(calendar)
+        val first_week_of_semester =
+          get_week_of_year(start_date_of_current_semester)
 
         val weeks_offset = current_week_of_year - first_week_of_semester
         // Note: timetable and week parity is changing every Sunday
-        val week = 1 + weeks_offset + if (current_day_of_week == Calendar.SUNDAY) 1 else 0
+        val next_week_if_today_is_sunday =
+          if (current_day_of_week == Calendar.SUNDAY) 1 else 0
+        val week = 1 + weeks_offset + next_week_if_today_is_sunday
         var dnm = week % 2 == 0 // Abbreviation for denominator
 
         // Starting from 11th week (only in 3rd semester) week parity is swapped
@@ -283,63 +302,76 @@ class MainActivity : AppCompatActivity() {
           dnm = !dnm
         }
 
-        val current_time = Time.now().full_format()
+        val current_time = Time.now()
+        val formatted_time = current_time.full_format()
         val week_parity = if (dnm) "denominator" else "numerator"
         val last_week = 17
         val current_week = if (week in 1..last_week) week else "18+"
-        binding.timeAndWeekTextView.text = "week $current_week $current_time $week_parity"
+        binding.timeAndWeekTextView.text =
+          "week $current_week $formatted_time $week_parity"
 
         // Handle changes in timetable (numerator/denominator, visibility)
-        for (indexed_week_day in timetable_configs.get_current_config().keys().withIndex()) {
-          val subjects =
-            timetable_configs.get_current_config()[indexed_week_day.value] as JSONObject
+        val timetable_config = timetable_configs.get_current_config()
+        for ((week_day_index, week_day) in
+        timetable_config.keys().withIndex()) {
+          val subjects = timetable_config[week_day] as JSONObject
           for (lessons_order in subjects.keys()) {
             // tmp is either a String or JSONArray with size 2
-            // Example: either "subject name" or ["numerator subject", "denominator subject"]
+            // Example:
+            // either "subject name"
+            // or ["numerator subject", "denominator subject"]
             val tmp = subjects[lessons_order]
             if (tmp !is JSONArray) continue
-            val subject = tmp[if (dnm) 1 else 0]
-            val subject_text_view = timetable[indexed_week_day.index][lessons_order.toInt()]
-            when (subject) {
-              "" -> subject_text_view.visibility = View.GONE
+            val subject_name = tmp[if (dnm) 1 else 0]
+            val subject_TextView =
+              timetable[week_day_index][lessons_order.toInt()]
+            when (subject_name) {
+              "" -> subject_TextView.visibility = View.GONE
               else -> {
-                subject_text_view.text = "$lessons_order. $subject"
+                subject_TextView.text = "$lessons_order. $subject_name"
                 // Check the other string in array
                 if (tmp[if (!dnm) 1 else 0] as String === "")
-                  subject_text_view.visibility = View.VISIBLE
+                  subject_TextView.visibility = View.VISIBLE
               }
             }
           }
         }
 
         // Color Timetable
-        val t = Time.now()
-        for ((week_day, Day) in timetable.withIndex()) {
-          val default_color = (if (week_day + 2 == current_day_of_week) yellow else green)
-          var color = default_color
-          for ((i, pair) in Day.withIndex()) {
-            if (i == 0) {
-              pair.setTextColor(getColor(color))
-            } else {
-              color = when {
-                week_day + 2 == current_day_of_week &&
-                        study_time(t, (i - 1) * 2) is Pair<*, *> -> red
-                else -> default_color
-              }
-              pair.setTextColor(getColor(color))
+        for ((week_day_index, week_day_TextView) in timetable.withIndex()) {
+          // Start index from 1 -> "+1"
+          // Start week from Monday -> "-1"
+          val is_current_day_of_week =
+            week_day_index + 1 == current_day_of_week - 1
+          val week_day_color = if (is_current_day_of_week) yellow else green
+          var color = week_day_color
+          for ((pair_index, pair_TextView) in week_day_TextView.withIndex()) {
+            if (pair_index == 0) {
+              pair_TextView.setTextColor(getColor(color))
+              continue
             }
+            val is_study_time =
+              study_time(current_time, (pair_index - 1) * 2) is Pair<*, *>
+            color = when {
+              is_current_day_of_week && is_study_time -> red
+              else -> week_day_color
+            }
+            pair_TextView.setTextColor(getColor(color))
           }
         }
 
         // Color Time
         for (i in time_period.indices) {
-          var color = if (correct_break(t, (i + 1) / 2.0)) yellow else green
-          if (study_time(t, i) is Pair<*, *>) color = red
+          val color = when {
+            correct_break(current_time, (i + 1) / 2.0) -> yellow
+            study_time(current_time, i) is Pair<*, *> -> red
+            else -> green
+          }
           timeTimeTable[i].setTextColor(getColor(color))
         }
 
-        val current_break = break_time(t)
-        val current_pair = study_time(t)
+        val current_break = break_time(current_time)
+        val current_pair = study_time(current_time)
         var index = -1
         var other_time = true
         when {
@@ -360,35 +392,42 @@ class MainActivity : AppCompatActivity() {
 
         val lessons_time_left = when {
           other_time || index % 2 == 1 -> "   --:--  "
-          else -> timings[index + 1].minus(t).short_format()
+          else -> timings[index + 1].minus(current_time).short_format()
         }
         val time_until_next_lesson = when {
           other_time || index > (timings.size - 3) -> {
             when {
-              other_time && t < timings[0] -> timings[0].minus(t).short_format()
+              other_time && current_time < timings[0] -> timings[0]
+                .minus(current_time).short_format()
               else -> "     --:--"
             }
           }
-          else -> timings[index - index % 2 + 2].minus(t).short_format()
+          else -> timings[index - index % 2 + 2]
+            .minus(current_time).short_format()
         }
 
         val pairs_time_left = when {
           other_time || index % 4 == 3 -> "      --:--  "
-          else -> timings[index - index % 4 + 3].minus(t).short_format()
+          else -> timings[index - index % 4 + 3]
+            .minus(current_time).short_format()
         }
         val time_until_next_pair = when {
           other_time || index > (timings.size - 5) -> {
             when {
-              other_time && t < timings[0] -> timings[0].minus(t).short_format()
+              other_time && current_time < timings[0] -> timings[0]
+                .minus(current_time).short_format()
               else -> "     --:--"
             }
           }
-          else -> timings[index - index % 4 + 4].minus(t).short_format()
+          else -> timings[index - index % 4 + 4]
+            .minus(current_time).short_format()
         }
         binding.lessonTextView.text =
-          "Lesson's time left: $lessons_time_left | Time until next lesson: $time_until_next_lesson"
+          "Lesson's time left: $lessons_time_left |" +
+                  " Time until next lesson: $time_until_next_lesson"
         binding.pairTextView.text =
-          "Pair's time left:    $pairs_time_left | Time until next pair:      $time_until_next_pair"
+          "Pair's time left:    $pairs_time_left |" +
+                  " Time until next pair:      $time_until_next_pair"
 
         loop_handler.postDelayed(this, 10)
       }

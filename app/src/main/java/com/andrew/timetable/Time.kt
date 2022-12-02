@@ -16,7 +16,8 @@ class Time private constructor(duration: Duration) {
   companion object {
     /**
      * Converts formatted string of hours and minutes to seconds
-     * @param hhmm string with "RegEx" format: H?H:M?M (H - hour \d, S - minute \d) (mod 24 hours)
+     * @param hhmm string with "RegEx" format: H?H:M?M
+     * (H - hour \d, S - minute \d) (mod 24 hours)
      * @throws InvalidParameterException if hhmm parameter has invalid format
      */
     fun from_hhmm(hhmm: String): Time {

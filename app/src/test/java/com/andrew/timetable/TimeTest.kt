@@ -35,7 +35,9 @@ class TimeTest {
       "00:a0",
       "00:0a"
     )) {
-      assertThrows(InvalidParameterException::class.java) { Time.from_hhmm(time) }
+      assertThrows(InvalidParameterException::class.java) {
+        Time.from_hhmm(time)
+      }
     }
   }
 
