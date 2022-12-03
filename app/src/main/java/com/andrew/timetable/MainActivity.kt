@@ -71,12 +71,12 @@ class MainActivity : AppCompatActivity() {
   private fun repopulate_SubjectLayout(
     timetable_configs: TimetableConfigs,
     timeTable: MutableList<MutableList<TextView>>,
-    which_config: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT
+    config: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT
   ) {
     binding.subjectsLayout.removeAllViews()
     timeTable.forEach { it.clear() }
     for (week_day in
-    timetable_configs.get_config(which_config).keys().withIndex()) {
+    timetable_configs.get_config(config).keys().withIndex()) {
       create_week_day_subject_table(
         timeTable[week_day.index],
         timetable_configs.get_current_config(),
