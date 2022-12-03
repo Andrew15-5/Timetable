@@ -23,6 +23,12 @@ class MainActivity : AppCompatActivity() {
   private val timings = utils.timings
   private val time_periods = utils.time_periods
 
+  // Color aliases
+  private val default_color = green
+  private val current_day_color = yellow
+  private val recess_color = current_day_color
+  private val study_color = red
+
   private lateinit var binding: ActivityMainBinding
 
   private fun create_TextView(
@@ -34,7 +40,7 @@ class MainActivity : AppCompatActivity() {
       val width = RelativeLayout.LayoutParams.WRAP_CONTENT
       val height = RelativeLayout.LayoutParams.WRAP_CONTENT
       layoutParams = RelativeLayout.LayoutParams(width, height)
-      setTextColor(getColor(green))
+      setTextColor(getColor(default_color))
       includeFontPadding = false
       textSize = TEXT_SIZE
       textAlignment = View.TEXT_ALIGNMENT_CENTER
@@ -200,7 +206,7 @@ class MainActivity : AppCompatActivity() {
         // Color everything in default color
         for (week_day_TextView in timetable) {
           for (pair_TextView in week_day_TextView) {
-            pair_TextView.setTextColor(getColor(green))
+            pair_TextView.setTextColor(getColor(default_color))
           }
         }
 
@@ -210,23 +216,17 @@ class MainActivity : AppCompatActivity() {
           // Start week from Monday => "-1"
           // Start index from 1 => "-1"
           val week_day_index = current_day_of_week - 2
-          val week_day_TextView = timetable[week_day_index]
-          val current_week_day_color = yellow
-          val current_pair_color = red
+          val week_day_TextViews = timetable[week_day_index]
+
           // Color current day of the week
-          for ((pair_index, pair_TextView) in week_day_TextView.withIndex()) {
-            if (pair_index == 0) {
-              // Color week day name
-              pair_TextView.setTextColor(getColor(current_week_day_color))
-              continue
-            }
-            val color = when {
-              is_study_time && pair_index + 1 == current_pair!!.pair -> {
-                current_pair_color
-              }
-              else -> current_week_day_color
-            }
-            pair_TextView.setTextColor(getColor(color))
+          for (pair_TextView in week_day_TextViews) {
+            pair_TextView.setTextColor(getColor(current_day_color))
+          }
+
+          // Color current pair
+          if (is_study_time) {
+            val pair_TextView = week_day_TextViews[current_pair!!.pair]
+            pair_TextView.setTextColor(getColor(study_color))
           }
         }
 
@@ -234,12 +234,18 @@ class MainActivity : AppCompatActivity() {
         val is_recess_time = current_recess != null
 
         // Color time
+        // Color all time periods
         for (i in time_periods.indices) {
-          val color = when {
-            is_recess_time && i == current_recess!!.time_period_index -> yellow
-            is_study_time && i == current_pair!!.time_period_index -> red
-            else -> green
+          timetable_for_time_periods[i].setTextColor(getColor(default_color))
+        }
+
+        // Color current time periods
+        if (is_study_time || is_recess_time) {
+          val i = when {
+            is_study_time -> current_pair!!.time_period_index
+            else -> current_recess!!.time_period_index
           }
+          val color = if (is_study_time) study_color else recess_color
           timetable_for_time_periods[i].setTextColor(getColor(color))
         }
 
