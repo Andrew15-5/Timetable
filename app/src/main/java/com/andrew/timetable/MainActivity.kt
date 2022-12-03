@@ -219,10 +219,13 @@ class MainActivity : AppCompatActivity() {
           }
         }
 
+        val current_recess = utils.get_recess(current_time)
+        val is_recess_time = current_recess != null
+
         // Color Time
         for (i in time_periods.indices) {
           val color = when {
-            utils.is_correct_recess(current_time, i) -> yellow
+            is_recess_time && i == current_recess!!.time_period_index -> yellow
             utils.study_time(current_time, i) is Pair<*, *> -> red
             else -> green
           }
@@ -230,7 +233,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         val current_pair = utils.study_time(current_time)
-        val current_recess = utils.get_recess(current_time)
         var index = -1
         var other_time = true
         when {

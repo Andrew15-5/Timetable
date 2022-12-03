@@ -53,13 +53,6 @@ class Utils {
     }
   }
 
-  fun is_correct_recess(time: Time, time_period_index: Int): Boolean {
-    return when (val recess = get_recess(time)) {
-      null -> false
-      else -> recess.time_period_index == time_period_index
-    }
-  }
-
   fun get_start_date_of_current_semester(year: Int, month: Int): LocalDate {
     val first_monday_of_february = LocalDate.of(year, Month.FEBRUARY, 1)
       .with(
