@@ -25,10 +25,10 @@ class Utils {
     val group_by = 4 // Each pair has 4 timings
     for (i in timings_str.indices step group_by) {
       val start = timings_str[i]
-      val break_start = timings_str[i + 1]
-      val break_end = timings_str[i + 2]
+      val recess_start = timings_str[i + 1]
+      val recess_end = timings_str[i + 2]
       val end = timings_str[i + 3]
-      mutable_time_periods += "$start-$break_start | $break_end-$end"
+      mutable_time_periods += "$start-$recess_start | $recess_end-$end"
       if (i + 4 >= timings_str.size) continue
       val next_start = timings_str[i + 4]
       mutable_time_periods += "$end-$next_start"
@@ -36,27 +36,27 @@ class Utils {
     time_periods = mutable_time_periods.toList()
   }
 
-  fun get_break(time: Time): Break? {
+  fun get_recess(time: Time): Recess? {
     return when {
-      time.from_until(timings[1], timings[2]) -> Break.during(1)
-      time.from_until(timings[3], timings[4]) -> Break.after(1)
-      time.from_until(timings[5], timings[6]) -> Break.during(2)
-      time.from_until(timings[7], timings[8]) -> Break.after(2)
-      time.from_until(timings[9], timings[10]) -> Break.during(3)
-      time.from_until(timings[11], timings[12]) -> Break.after(3)
-      time.from_until(timings[13], timings[14]) -> Break.during(4)
-      time.from_until(timings[15], timings[16]) -> Break.after(4)
-      time.from_until(timings[17], timings[18]) -> Break.during(5)
-      time.from_until(timings[19], timings[20]) -> Break.after(5)
-      time.from_until(timings[21], timings[22]) -> Break.during(6)
+      time.from_until(timings[1], timings[2]) -> Recess.during(1)
+      time.from_until(timings[3], timings[4]) -> Recess.after(1)
+      time.from_until(timings[5], timings[6]) -> Recess.during(2)
+      time.from_until(timings[7], timings[8]) -> Recess.after(2)
+      time.from_until(timings[9], timings[10]) -> Recess.during(3)
+      time.from_until(timings[11], timings[12]) -> Recess.after(3)
+      time.from_until(timings[13], timings[14]) -> Recess.during(4)
+      time.from_until(timings[15], timings[16]) -> Recess.after(4)
+      time.from_until(timings[17], timings[18]) -> Recess.during(5)
+      time.from_until(timings[19], timings[20]) -> Recess.after(5)
+      time.from_until(timings[21], timings[22]) -> Recess.during(6)
       else -> null
     }
   }
 
-  fun is_break_time(time: Time, time_period_index: Int): Boolean {
-    return when (val a_break = get_break(time)) {
+  fun is_correct_recess(time: Time, time_period_index: Int): Boolean {
+    return when (val recess = get_recess(time)) {
       null -> false
-      else -> a_break.time_period_index == time_period_index
+      else -> recess.time_period_index == time_period_index
     }
   }
 

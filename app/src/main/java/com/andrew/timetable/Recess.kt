@@ -1,6 +1,6 @@
 package com.andrew.timetable
 
-class Break {
+class Recess {
   val is_between_pairs: Boolean
   val is_during_pair: Boolean
   val time_period_index: Int
@@ -21,7 +21,7 @@ class Break {
   }
 
   companion object {
-    fun after(pair: Int): Break {
+    fun after(pair: Int): Recess {
       // y = x + (x - 1) <- correlation formula
       // 1 -> 1
       // 2 -> 3
@@ -36,10 +36,10 @@ class Break {
       // 4 -> 15
       // 5 -> 19
       val timing_index = 4 * pair - 1
-      return Break(pair, time_period_index, timing_index, true)
+      return Recess(pair, time_period_index, timing_index, true)
     }
 
-    fun during(pair: Int): Break {
+    fun during(pair: Int): Recess {
       // y = x + (x - 2) <- correlation formula
       // 1 -> 0
       // 2 -> 2
@@ -55,7 +55,7 @@ class Break {
       // 5 -> 17
       // 6 -> 21
       val timing_index = 4 * pair - 3
-      return Break(pair, time_period_index, timing_index, false)
+      return Recess(pair, time_period_index, timing_index, false)
     }
   }
 }

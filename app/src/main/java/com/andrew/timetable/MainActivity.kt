@@ -222,7 +222,7 @@ class MainActivity : AppCompatActivity() {
         // Color Time
         for (i in time_periods.indices) {
           val color = when {
-            utils.is_break_time(current_time, i) -> yellow
+            utils.is_correct_recess(current_time, i) -> yellow
             utils.study_time(current_time, i) is Pair<*, *> -> red
             else -> green
           }
@@ -230,7 +230,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val current_pair = utils.study_time(current_time)
-        val current_break = utils.get_break(current_time)
+        val current_recess = utils.get_recess(current_time)
         var index = -1
         var other_time = true
         when {
@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
               2 -> index = (current_pair.first as Int - 1) * 4 + 2
             }
           }
-          current_break != null -> index = current_break.timing_index
+          current_recess != null -> index = current_recess.timing_index
         }
         if (index != -1) other_time = false
 
