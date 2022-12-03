@@ -8,30 +8,35 @@ import org.threeten.bp.temporal.WeekFields
 import java.util.*
 
 class Utils {
-  val timings = arrayOf(
+  // Each line has 4 timings and represent nth pair ([1;6])
+  private val timings_str = arrayOf(
     "8:30", "9:15", "9:20", "10:05",
     "10:20", "11:05", "11:10", "11:55",
     "12:10", "12:55", "13:00", "13:45",
     "14:15", "15:00", "15:05", "15:50",
     "16:05", "15:50", "16:55", "17:40",
     "17:50", "18:35", "18:40", "19:25"
-  ).map { time -> Time.from_hhmm(time) }
-
-  val time_periods = arrayOf(
-    "8:30 - 9:15 | 9:20 -10:05",
-    "10:05-10:20",
-    "10:20-11:05 | 11:10-11:55",
-    "11:55-12:10",
-    "12:10-12:55 | 13:00-13:45",
-    "13:45-14:15",
-    "14:15-15:00 | 15:05-15:50",
-    "15:50-16:05",
-    "16:05-16:50 | 16:55-17:40",
-    "17:40-17:50",
-    "17:50-18:35 | 18:40-19:25"
   )
+  val timings = timings_str.map { time -> Time.from_hhmm(time) }
+  val time_periods: List<String>
 
-  fun break_time(time: Time): Any {
+  init {
+    val mutable_time_periods = mutableListOf<String>()
+    val group_by = 4 // Each pair has 4 timings
+    for (i in timings_str.indices step group_by) {
+      val start = timings_str[i]
+      val break_start = timings_str[i + 1]
+      val break_end = timings_str[i + 2]
+      val end = timings_str[i + 3]
+      mutable_time_periods += "$start-$break_start | $break_end-$end"
+      if (i + 4 >= timings_str.size) continue
+      val next_start = timings_str[i + 4]
+      mutable_time_periods += "$end-$next_start"
+    }
+    time_periods = mutable_time_periods.toList()
+  }
+
+  fun get_break(time: Time): Int? {
     return when {
       time.from_until(timings[1], timings[2]) -> 1
       time.from_until(timings[3], timings[4]) -> 12
