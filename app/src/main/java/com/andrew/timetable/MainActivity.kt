@@ -202,16 +202,19 @@ class MainActivity : AppCompatActivity() {
           }
         }
 
-        // Color timetable
+        val current_pair = utils.get_pair(current_time)
+        val current_recess = utils.get_recess(current_time)
+        val is_recess_time = current_recess != null
+        val is_study_time = current_pair != null
+
+        // --------------------------|Color timetable|--------------------------
         // Color everything in default color
-        for (week_day_TextView in timetable) {
-          for (pair_TextView in week_day_TextView) {
+        for (week_day_TextViews in timetable) {
+          for (pair_TextView in week_day_TextViews) {
             pair_TextView.setTextColor(getColor(default_color))
           }
         }
 
-        val current_pair = utils.get_pair(current_time)
-        val is_study_time = current_pair != null
         if (!today_is_sunday) {
           // Start week from Monday => "-1"
           // Start index from 1 => "-1"
@@ -229,11 +232,9 @@ class MainActivity : AppCompatActivity() {
             pair_TextView.setTextColor(getColor(study_color))
           }
         }
+        // --------------------------|Color timetable|--------------------------
 
-        val current_recess = utils.get_recess(current_time)
-        val is_recess_time = current_recess != null
-
-        // Color time
+        // ----------------------------|Color time|-----------------------------
         // Color all time periods
         for (i in time_periods.indices) {
           timetable_for_time_periods[i].setTextColor(getColor(default_color))
@@ -248,6 +249,7 @@ class MainActivity : AppCompatActivity() {
           val color = if (is_study_time) study_color else recess_color
           timetable_for_time_periods[i].setTextColor(getColor(color))
         }
+        // ----------------------------|Color time|-----------------------------
 
         val other_time = current_pair == null && current_recess == null
         val index = when {
