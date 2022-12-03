@@ -5,13 +5,13 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.security.InvalidParameterException
 
-class Time private constructor(duration: Duration) {
+class Time {
 
-  private val time: Duration
-
-  init {
+  private constructor(duration: Duration) {
     time = Duration.ofSeconds(duration.seconds % Duration.ofDays(1).seconds)
   }
+
+  private val time: Duration
 
   companion object {
     /**
