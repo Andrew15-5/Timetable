@@ -222,15 +222,15 @@ class MainActivity : AppCompatActivity() {
         // Color Time
         for (i in time_periods.indices) {
           val color = when {
-            utils.correct_break(current_time, i) -> yellow
+            utils.is_break_time(current_time, i) -> yellow
             utils.study_time(current_time, i) is Pair<*, *> -> red
             else -> green
           }
           timetable_for_time_periods[i].setTextColor(getColor(color))
         }
 
-        val current_break = utils.break_time(current_time)
         val current_pair = utils.study_time(current_time)
+        val current_break = utils.get_break(current_time)
         var index = -1
         var other_time = true
         when {
@@ -240,12 +240,7 @@ class MainActivity : AppCompatActivity() {
               2 -> index = (current_pair.first as Int - 1) * 4 + 2
             }
           }
-          current_break is Int -> {
-            when {
-              current_break > 10 -> index = (current_break / 10 - 1) * 4 + 3
-              current_break < 10 -> index = (current_break - 1) * 4 + 1
-            }
-          }
+          current_break != null -> index = current_break.timing_index
         }
         if (index != -1) other_time = false
 

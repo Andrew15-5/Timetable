@@ -36,33 +36,28 @@ class Utils {
     time_periods = mutable_time_periods.toList()
   }
 
-  fun get_break(time: Time): Int? {
+  fun get_break(time: Time): Break? {
     return when {
-      time.from_until(timings[1], timings[2]) -> 1
-      time.from_until(timings[3], timings[4]) -> 12
-      time.from_until(timings[5], timings[6]) -> 2
-      time.from_until(timings[7], timings[8]) -> 23
-      time.from_until(timings[9], timings[10]) -> 3
-      time.from_until(timings[11], timings[12]) -> 34
-      time.from_until(timings[13], timings[14]) -> 4
-      time.from_until(timings[15], timings[16]) -> 45
-      time.from_until(timings[17], timings[18]) -> 5
-      time.from_until(timings[19], timings[20]) -> 56
-      time.from_until(timings[21], timings[22]) -> 6
-      else -> false
+      time.from_until(timings[1], timings[2]) -> Break.during(1)
+      time.from_until(timings[3], timings[4]) -> Break.after(1)
+      time.from_until(timings[5], timings[6]) -> Break.during(2)
+      time.from_until(timings[7], timings[8]) -> Break.after(2)
+      time.from_until(timings[9], timings[10]) -> Break.during(3)
+      time.from_until(timings[11], timings[12]) -> Break.after(3)
+      time.from_until(timings[13], timings[14]) -> Break.during(4)
+      time.from_until(timings[15], timings[16]) -> Break.after(4)
+      time.from_until(timings[17], timings[18]) -> Break.during(5)
+      time.from_until(timings[19], timings[20]) -> Break.after(5)
+      time.from_until(timings[21], timings[22]) -> Break.during(6)
+      else -> null
     }
   }
 
-  fun correct_break(time: Time, time_period_index: Int): Boolean {
-    val y = (time_period_index + 1) / 2.0 // \d.5 for lesson, \d.0 for break
-    when (val ret = break_time(time)) {
-      false -> return false
-      is Int -> return when {
-        ret < 10 -> (ret - 0.5 == y)
-        else -> ((ret / 10).toDouble() == y)
-      }
+  fun is_break_time(time: Time, time_period_index: Int): Boolean {
+    return when (val a_break = get_break(time)) {
+      null -> false
+      else -> a_break.time_period_index == time_period_index
     }
-    return false
   }
 
   fun get_start_date_of_current_semester(year: Int, month: Int): LocalDate {
