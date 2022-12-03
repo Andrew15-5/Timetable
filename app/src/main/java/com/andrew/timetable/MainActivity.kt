@@ -204,6 +204,8 @@ class MainActivity : AppCompatActivity() {
           }
         }
 
+        val current_pair = utils.get_pair(current_time)
+        val is_study_time = current_pair != null
         if (!today_is_sunday) {
           // Start week from Monday => "-1"
           // Start index from 1 => "-1"
@@ -218,10 +220,10 @@ class MainActivity : AppCompatActivity() {
               pair_TextView.setTextColor(getColor(current_week_day_color))
               continue
             }
-            val is_study_time =
-              utils.study_time(current_time, (pair_index - 1) * 2) is Pair<*, *>
             val color = when {
-              is_study_time -> current_pair_color
+              is_study_time && pair_index + 1 == current_pair!!.pair -> {
+                current_pair_color
+              }
               else -> current_week_day_color
             }
             pair_TextView.setTextColor(getColor(color))
@@ -235,25 +237,18 @@ class MainActivity : AppCompatActivity() {
         for (i in time_periods.indices) {
           val color = when {
             is_recess_time && i == current_recess!!.time_period_index -> yellow
-            utils.study_time(current_time, i) is Pair<*, *> -> red
+            is_study_time && i == current_pair!!.time_period_index -> red
             else -> green
           }
           timetable_for_time_periods[i].setTextColor(getColor(color))
         }
 
-        val current_pair = utils.study_time(current_time)
-        var index = -1
-        var other_time = true
-        when {
-          current_pair is Pair<*, *> -> {
-            when (current_pair.second) {
-              1 -> index = (current_pair.first as Int - 1) * 4
-              2 -> index = (current_pair.first as Int - 1) * 4 + 2
-            }
-          }
-          current_recess != null -> index = current_recess.timing_index
+        val other_time = current_pair == null && current_recess == null
+        val index = when {
+          current_pair != null -> current_pair.timing_index
+          current_recess != null -> current_recess.timing_index
+          else -> -1
         }
-        if (index != -1) other_time = false
 
         val lessons_time_left = when {
           other_time || index % 2 == 1 -> "   --:--  "

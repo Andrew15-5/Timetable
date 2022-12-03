@@ -116,31 +116,21 @@ class Utils {
     )
   }
 
-  fun study_time(time: Time, y: Int = -1): Any {
-    if (y == -1 || y == 0) {
-      if (time.from_until(timings[0], timings[1])) return Pair(1, 1)
-      else if (time.from_until(timings[2], timings[3])) return Pair(1, 2)
+  fun get_pair(time: Time): Pair? {
+    return when {
+      time.from_until(timings[0], timings[1]) -> Pair(1, 1)
+      time.from_until(timings[2], timings[3]) -> Pair(1, 2)
+      time.from_until(timings[4], timings[5]) -> Pair(2, 1)
+      time.from_until(timings[6], timings[7]) -> Pair(2, 2)
+      time.from_until(timings[8], timings[9]) -> Pair(3, 1)
+      time.from_until(timings[10], timings[11]) -> Pair(3, 2)
+      time.from_until(timings[12], timings[13]) -> Pair(4, 1)
+      time.from_until(timings[14], timings[15]) -> Pair(4, 2)
+      time.from_until(timings[16], timings[17]) -> Pair(5, 1)
+      time.from_until(timings[18], timings[19]) -> Pair(5, 2)
+      time.from_until(timings[20], timings[21]) -> Pair(6, 1)
+      time.from_until(timings[22], timings[23]) -> Pair(6, 2)
+      else -> null
     }
-    if (y == -1 || y == 2) {
-      if (time.from_until(timings[4], timings[5])) return Pair(2, 1)
-      else if (time.from_until(timings[6], timings[7])) return Pair(2, 2)
-    }
-    if (y == -1 || y == 4) {
-      if (time.from_until(timings[8], timings[9])) return Pair(3, 1)
-      else if (time.from_until(timings[10], timings[11])) return Pair(3, 2)
-    }
-    if (y == -1 || y == 6) {
-      if (time.from_until(timings[12], timings[13])) return Pair(4, 1)
-      else if (time.from_until(timings[14], timings[15])) return Pair(4, 2)
-    }
-    if (y == -1 || y == 8) {
-      if (time.from_until(timings[16], timings[17])) return Pair(5, 1)
-      else if (time.from_until(timings[18], timings[19])) return Pair(5, 2)
-    }
-    if (y == -1 || y == 10) {
-      if (time.from_until(timings[20], timings[21])) return Pair(6, 1)
-      else if (time.from_until(timings[22], timings[23])) return Pair(6, 2)
-    }
-    return false
   }
 }
