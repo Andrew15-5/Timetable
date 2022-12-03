@@ -151,8 +151,8 @@ class MainActivity : AppCompatActivity() {
 
         val weeks_offset = current_week_of_year - first_week_of_semester
         // Note: timetable and week parity is changing every Sunday
-        val next_week_if_today_is_sunday =
-          if (current_day_of_week == Calendar.SUNDAY) 1 else 0
+        val today_is_sunday = current_day_of_week == Calendar.SUNDAY
+        val next_week_if_today_is_sunday = if (today_is_sunday) 1 else 0
         val week = 1 + weeks_offset + next_week_if_today_is_sunday
         var dnm = week % 2 == 0 // Abbreviation for denominator
 
@@ -196,24 +196,33 @@ class MainActivity : AppCompatActivity() {
           }
         }
 
-        // Color Timetable
-        for ((week_day_index, week_day_TextView) in timetable.withIndex()) {
-          // Start index from 1 -> "+1"
-          // Start week from Monday -> "-1"
-          val is_current_day_of_week =
-            week_day_index + 1 == current_day_of_week - 1
-          val week_day_color = if (is_current_day_of_week) yellow else green
-          var color = week_day_color
+        // Color timetable
+        // Color everything in default color
+        for (week_day_TextView in timetable) {
+          for (pair_TextView in week_day_TextView) {
+            pair_TextView.setTextColor(getColor(green))
+          }
+        }
+
+        if (!today_is_sunday) {
+          // Start week from Monday => "-1"
+          // Start index from 1 => "-1"
+          val week_day_index = current_day_of_week - 2
+          val week_day_TextView = timetable[week_day_index]
+          val current_week_day_color = yellow
+          val current_pair_color = red
+          // Color current day of the week
           for ((pair_index, pair_TextView) in week_day_TextView.withIndex()) {
             if (pair_index == 0) {
-              pair_TextView.setTextColor(getColor(color))
+              // Color week day name
+              pair_TextView.setTextColor(getColor(current_week_day_color))
               continue
             }
             val is_study_time =
               utils.study_time(current_time, (pair_index - 1) * 2) is Pair<*, *>
-            color = when {
-              is_current_day_of_week && is_study_time -> red
-              else -> week_day_color
+            val color = when {
+              is_study_time -> current_pair_color
+              else -> current_week_day_color
             }
             pair_TextView.setTextColor(getColor(color))
           }
@@ -222,7 +231,7 @@ class MainActivity : AppCompatActivity() {
         val current_recess = utils.get_recess(current_time)
         val is_recess_time = current_recess != null
 
-        // Color Time
+        // Color time
         for (i in time_periods.indices) {
           val color = when {
             is_recess_time && i == current_recess!!.time_period_index -> yellow
