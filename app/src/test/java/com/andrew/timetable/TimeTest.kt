@@ -5,21 +5,9 @@ import org.junit.Test
 import java.security.InvalidParameterException
 
 class TimeTest {
-  fun seconds_from(hhmm: String): Long {
-    return Time.from_hhmm(hhmm).to_seconds()
-  }
-
-  fun full_from(hhmm: String): String {
-    return Time.from_hhmm(hhmm).full_format()
-  }
-
-  fun short_from(hhmm: String): String {
-    return Time.from_hhmm(hhmm).short_format()
-  }
-
   @Test
   fun test_throw_InvalidParameterException_when_instantiating_from_hhmm() {
-    for (time in arrayOf(
+    arrayOf(
       "",
       ":",
       "0000",
@@ -33,7 +21,7 @@ class TimeTest {
       "0a:00",
       "00:a0",
       "00:0a"
-    )) {
+    ).forEach { time ->
       assertThrows(InvalidParameterException::class.java) {
         Time.from_hhmm(time)
       }
@@ -42,81 +30,92 @@ class TimeTest {
 
   @Test
   fun test_to_seconds() {
-    for (time in arrayOf("0:0", "0:00", "00:0", "00:00")) {
-      assertEquals(0, seconds_from(time))
+    arrayOf("0:0", "0:00", "00:0", "00:00").forEach { hhmm ->
+      assertEquals(0, Time.from_hhmm(hhmm).to_seconds())
     }
-    assertEquals(60, seconds_from("0:1"))
-    assertEquals(60, seconds_from("0:01"))
-    assertEquals(60 * 10, seconds_from("0:10"))
-    assertEquals(60 * 30, seconds_from("0:30"))
-    assertEquals(60 * 59, seconds_from("0:59"))
-    assertEquals(60 * 60, seconds_from("0:60"))
-    assertEquals(60 * 99, seconds_from("0:99"))
-    assertEquals(3600, seconds_from("1:0"))
-    assertEquals(3600, seconds_from("1:00"))
-    assertEquals(3600 + 60, seconds_from("1:01"))
-    assertEquals(3600 + 60 * 10, seconds_from("1:10"))
-    assertEquals(3600 + 60 * 11, seconds_from("1:11"))
-    assertEquals(3600 * 3 + 60 * 54, seconds_from("3:54"))
-    assertEquals(3600 * 15 + 60 * 31, seconds_from("15:31"))
-    assertEquals(3600 * 23 + 60 * 59, seconds_from("23:59"))
-    assertEquals(0, seconds_from("23:60"))
-    assertEquals(60 * 59, seconds_from("24:59"))
-    assertEquals(60 * 60, seconds_from("24:60"))
-    assertEquals(3600 * 4 + 60 * 39, seconds_from("99:99"))
+    mapOf(
+      60 to "0:1",
+      60 to "0:01",
+      60 * 10 to "0:10",
+      60 * 30 to "0:30",
+      60 * 59 to "0:59",
+      60 * 60 to "0:60",
+      60 * 99 to "0:99",
+      3600 to "1:0",
+      3600 to "1:00",
+      3600 + 60 to "1:01",
+      3600 + 60 * 10 to "1:10",
+      3600 + 60 * 11 to "1:11",
+      3600 * 3 + 60 * 54 to "3:54",
+      3600 * 15 + 60 * 31 to "15:31",
+      3600 * 23 + 60 * 59 to "23:59",
+      0 to "23:60",
+      60 * 59 to "24:59",
+      60 * 60 to "24:60",
+      3600 * 4 + 60 * 39 to "99:99",
+    ).forEach { (x, y) ->
+      assertEquals(x.toLong(), Time.from_hhmm(y).to_seconds())
+    }
   }
 
   @Test
   fun test_full_format() {
-    for (time in arrayOf("0:0", "0:00", "00:0", "00:00")) {
-      assertEquals("00:00:00", full_from(time))
+    arrayOf("0:0", "0:00", "00:0", "00:00").forEach { hhmm ->
+      assertEquals("00:00:00", Time.from_hhmm(hhmm).full_format())
     }
-    assertEquals("00:01:00", full_from("0:1"))
-    assertEquals("00:01:00", full_from("0:01"))
-    assertEquals("00:10:00", full_from("0:10"))
-    assertEquals("00:30:00", full_from("0:30"))
-    assertEquals("00:59:00", full_from("0:59"))
-    assertEquals("01:00:00", full_from("0:60"))
-    assertEquals("01:39:00", full_from("0:99"))
-    assertEquals("01:00:00", full_from("1:0"))
-    assertEquals("01:00:00", full_from("1:00"))
-    assertEquals("01:01:00", full_from("1:01"))
-    assertEquals("01:10:00", full_from("1:10"))
-    assertEquals("01:11:00", full_from("1:11"))
-    assertEquals("03:54:00", full_from("3:54"))
-    assertEquals("15:31:00", full_from("15:31"))
-    assertEquals("23:59:00", full_from("23:59"))
-    assertEquals("00:00:00", full_from("23:60"))
-    assertEquals("00:59:00", full_from("24:59"))
-    assertEquals("01:00:00", full_from("24:60"))
-    assertEquals("04:39:00", full_from("99:99"))
+    mapOf(
+      "00:01:00" to "0:1",
+      "00:01:00" to "0:01",
+      "00:10:00" to "0:10",
+      "00:30:00" to "0:30",
+      "00:59:00" to "0:59",
+      "01:00:00" to "0:60",
+      "01:39:00" to "0:99",
+      "01:00:00" to "1:0",
+      "01:00:00" to "1:00",
+      "01:01:00" to "1:01",
+      "01:10:00" to "1:10",
+      "01:11:00" to "1:11",
+      "03:54:00" to "3:54",
+      "15:31:00" to "15:31",
+      "23:59:00" to "23:59",
+      "00:00:00" to "23:60",
+      "00:59:00" to "24:59",
+      "01:00:00" to "24:60",
+      "04:39:00" to "99:99",
+    ).forEach { (x, y) -> assertEquals(x, Time.from_hhmm(y).full_format()) }
   }
 
   @Test
   fun test_short_format() {
     val prefix = "   "
-    for (time in arrayOf("0:0", "0:00", "00:0", "00:00")) {
-      assertEquals(prefix + "00:00", short_from(time))
+    arrayOf("0:0", "0:00", "00:0", "00:00").forEach { hhmm ->
+      assertEquals(prefix + "00:00", Time.from_hhmm(hhmm).short_format())
     }
-    assertEquals(prefix + "01:00", short_from("0:1"))
-    assertEquals(prefix + "01:00", short_from("0:01"))
-    assertEquals(prefix + "10:00", short_from("0:10"))
-    assertEquals(prefix + "30:00", short_from("0:30"))
-    assertEquals(prefix + "59:00", short_from("0:59"))
-    assertEquals("1:00:00", short_from("0:60"))
-    assertEquals("1:39:00", short_from("0:99"))
-    assertEquals("1:00:00", short_from("1:0"))
-    assertEquals("1:00:00", short_from("1:00"))
-    assertEquals("1:01:00", short_from("1:01"))
-    assertEquals("1:10:00", short_from("1:10"))
-    assertEquals("1:11:00", short_from("1:11"))
-    assertEquals("3:54:00", short_from("3:54"))
-    assertEquals("15:31:00", short_from("15:31"))
-    assertEquals("23:59:00", short_from("23:59"))
-    assertEquals(prefix + "00:00", short_from("23:60"))
-    assertEquals(prefix + "59:00", short_from("24:59"))
-    assertEquals("1:00:00", short_from("24:60"))
-    assertEquals("4:39:00", short_from("99:99"))
+    mapOf(
+      "01:00" to "0:1",
+      "01:00" to "0:01",
+      "10:00" to "0:10",
+      "30:00" to "0:30",
+      "59:00" to "0:59",
+      "1:00:00" to "0:60",
+      "1:39:00" to "0:99",
+      "1:00:00" to "1:0",
+      "1:00:00" to "1:00",
+      "1:01:00" to "1:01",
+      "1:10:00" to "1:10",
+      "1:11:00" to "1:11",
+      "3:54:00" to "3:54",
+      "15:31:00" to "15:31",
+      "23:59:00" to "23:59",
+      "00:00" to "23:60",
+      "59:00" to "24:59",
+      "1:00:00" to "24:60",
+      "4:39:00" to "99:99",
+    ).forEach { (x, y) ->
+      val expected = if (x.length <= 5) prefix + x else x
+      assertEquals(expected, Time.from_hhmm(y).short_format())
+    }
   }
 
   @Test
