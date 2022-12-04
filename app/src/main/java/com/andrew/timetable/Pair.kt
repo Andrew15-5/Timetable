@@ -8,11 +8,13 @@ import java.security.InvalidParameterException
  * @throws InvalidParameterException if lesson value is invalid
  */
 class Pair(ordinal: Int, lesson: Int) {
+  val lesson: Int
   val pair: Int
   val time_period_index: Int
   val timing_index: Int
 
   init {
+    this.lesson = lesson
     pair = ordinal
     // y = x + (x - 2) <- correlation formula
     // 1 -> 0
