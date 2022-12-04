@@ -20,7 +20,6 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
   private val TEXT_SIZE = 16F // 18F
   private val utils = Utils()
-  private val timings = utils.timings
   private val time_periods = utils.time_periods
 
   // Color aliases
@@ -251,52 +250,15 @@ class MainActivity : AppCompatActivity() {
         }
         // ----------------------------|Color time|-----------------------------
 
-        val other_time = current_pair == null && current_recess == null
-        val index = when {
-          current_pair != null -> current_pair.timing_index
-          current_recess != null -> current_recess.timing_index
-          else -> -1
-        }
-
-        val lessons_time_left = when {
-          other_time || index % 2 == 1 -> "   --:--  "
-          else -> timings[index + 1].minus(current_time).short_format()
-        }
-
-        val time_until_next_lesson = when {
-          other_time || index > (timings.size - 3) -> {
-            when {
-              other_time && current_time < timings[0] -> timings[0]
-                .minus(current_time).short_format()
-              else -> "     --:--"
-            }
-          }
-          else -> timings[index - index % 2 + 2]
-            .minus(current_time).short_format()
-        }
-
-        val pairs_time_left = when {
-          other_time || index % 4 == 3 -> "      --:--  "
-          else -> timings[index - index % 4 + 3]
-            .minus(current_time).short_format()
-        }
-
-        val time_until_next_pair = when {
-          other_time || index > (timings.size - 5) -> {
-            when {
-              other_time && current_time < timings[0] -> timings[0]
-                .minus(current_time).short_format()
-              else -> "     --:--"
-            }
-          }
-          else -> timings[index - index % 4 + 4]
-            .minus(current_time).short_format()
-        }
-
+        val lessons_time_left = utils.get_lesson_time_left(current_time)
+        val time_until_next_lesson =
+          utils.get_time_until_next_lesson(current_time)
         binding.lessonTextView.text =
           "Lesson's time left: $lessons_time_left |" +
                   " Time until next lesson: $time_until_next_lesson"
 
+        val pairs_time_left = utils.get_pairs_time_left(current_time)
+        val time_until_next_pair = utils.get_time_until_next_pair(current_time)
         binding.pairTextView.text =
           "Pair's time left:    $pairs_time_left |" +
                   " Time until next pair:      $time_until_next_pair"

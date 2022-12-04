@@ -36,6 +36,74 @@ class Utils {
     time_periods = mutable_time_periods.toList()
   }
 
+  fun get_lesson_time_left(time: Time): String {
+    val timing_index = get_pair(time)?.timing_index
+    val study_time = timing_index != null
+    return when {
+      study_time -> timings[timing_index!! + 1].minus(time).short_format()
+      else -> "   --:--  "
+    }
+  }
+
+  fun get_time_until_next_lesson(time: Time): String {
+    val last_recess_end_time = timings.reversed()[1]
+    val pair_index = get_pair(time)?.timing_index
+    val recess_index = get_recess(time)?.timing_index
+    val start_time = timings[0]
+    val study_time = pair_index != null
+    val other_time = when {
+      time < start_time -> start_time
+      time >= last_recess_end_time -> return "     --:--"
+      study_time -> timings[pair_index!! + 2]
+      else -> timings[recess_index!! + 1]
+    }
+    return other_time.minus(time).short_format()
+  }
+
+  fun get_pairs_time_left(time: Time): String {
+    val pair = get_pair(time)
+    val pair_index = pair?.timing_index
+    val recess = get_recess(time)
+    val recess_index = recess?.timing_index
+    val recess_time = recess != null
+    val timing_index = pair_index ?: recess_index
+    val not_study_or_recess_time = timing_index == null
+    val other_time = when {
+      not_study_or_recess_time || recess_time && recess!!.is_between_pairs -> {
+        return "      --:--  "
+      }
+      recess_time && recess!!.is_during_pair -> timings[recess_index!! + 2]
+      else -> when (pair!!.lesson) {
+        1 -> timings[pair_index!! + 3]
+        else -> timings[pair_index!! + 1]
+      }
+    }
+    return other_time.minus(time).short_format()
+  }
+
+  fun get_time_until_next_pair(time: Time): String {
+    val last_recess_between_pairs_end = timings.reversed()[3]
+    val pair = get_pair(time)
+    val pair_index = pair?.timing_index
+    val recess = get_recess(time)
+    val recess_index = recess?.timing_index
+    val start_time = timings[0]
+    val study_time = pair != null
+    val other_time = when {
+      time < start_time -> start_time
+      time >= last_recess_between_pairs_end -> return "     --:--"
+      study_time -> when (pair!!.lesson) {
+        1 -> timings[pair_index!! + 4]
+        else -> timings[pair_index!! + 2]
+      }
+      else -> when {
+        recess!!.is_during_pair -> timings[recess_index!! + 3]
+        else -> timings[recess_index!! + 1]
+      }
+    }
+    return other_time.minus(time).short_format()
+  }
+
   fun get_recess(time: Time): Recess? {
     return when {
       time.from_until(timings[1], timings[2]) -> Recess.during(1)
