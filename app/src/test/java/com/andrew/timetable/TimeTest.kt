@@ -1,7 +1,6 @@
 package com.andrew.timetable
 
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertThrows
+import org.junit.Assert.*
 import org.junit.Test
 import java.security.InvalidParameterException
 
@@ -118,5 +117,38 @@ class TimeTest {
     assertEquals(prefix + "59:00", short_from("24:59"))
     assertEquals("1:00:00", short_from("24:60"))
     assertEquals("4:39:00", short_from("99:99"))
+  }
+
+  @Test
+  fun test_less_than() {
+    mapOf(
+      "0:00" to "0:01",
+      "1:00" to "1:01",
+      "1:00" to "2:00",
+      "23:58" to "23:59",
+    ).forEach { (x, y) -> assertTrue(Time.from_hhmm(x) < Time.from_hhmm(y)) }
+  }
+
+  @Test
+  fun test_greater_than() {
+    mapOf(
+      "0:00" to "0:01",
+      "1:00" to "1:01",
+      "1:00" to "2:00",
+      "23:58" to "23:59",
+    ).forEach { (x, y) -> assertTrue(Time.from_hhmm(y) > Time.from_hhmm(x)) }
+  }
+
+  @Test
+  fun test_equal_to() {
+    arrayOf(
+      "0:00",
+      "0:01",
+      "1:00",
+      "12:00",
+      "23:59",
+    ).forEach { hhmm ->
+      assertTrue(Time.from_hhmm(hhmm) == Time.from_hhmm(hhmm))
+    }
   }
 }

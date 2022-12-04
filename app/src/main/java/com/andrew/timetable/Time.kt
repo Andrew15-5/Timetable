@@ -65,11 +65,23 @@ class Time {
     return time.seconds
   }
 
-  operator fun compareTo(other_time: Time): Int {
-    return time.compareTo(other_time.time)
+  operator fun compareTo(other: Time): Int {
+    return time.compareTo(other.time)
   }
 
-  operator fun minus(other_time: Time): Time {
-    return Time(time - other_time.time)
+  override operator fun equals(other: Any?): Boolean {
+    return other is Time? && time == other?.time
+  }
+
+  override fun hashCode(): Int {
+    return time.hashCode()
+  }
+
+  operator fun minus(other: Time): Time {
+    return Time(time - other.time)
+  }
+
+  operator fun plus(other: Time): Time {
+    return Time(time + other.time)
   }
 }
