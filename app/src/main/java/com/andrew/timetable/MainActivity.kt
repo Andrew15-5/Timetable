@@ -56,19 +56,17 @@ class MainActivity : AppCompatActivity() {
   ) {
     val subjects: JSONObject = timetable_config[week_day] as JSONObject
     text_view_list += create_TextView(week_day, binding.subjectsLayout)
-    for (lessons_order in subjects.keys()) {
-      var subject = ""
-      with(subjects[lessons_order]) {
-        if (this is String) subject = this
-//        when (this) {
-//          is String -> subject = this
-//          is Array<*> -> {
+    for (subject_order in subjects.keys()) {
+      val subject = subjects[subject_order]
+      val subject_str = if (subject is String) subject else ""
+//      when (this) {
+//        is String -> subject_str = this
+//        is Array<*> -> {
 //
-//          }
 //        }
-      }
+//      }
       text_view_list += create_TextView(
-        "$lessons_order. $subject", binding.subjectsLayout
+        "$subject_order. $subject_str", binding.subjectsLayout
       )
     }
   }
@@ -179,20 +177,20 @@ class MainActivity : AppCompatActivity() {
         for ((week_day_index, week_day) in
         timetable_config.keys().withIndex()) {
           val subjects = timetable_config[week_day] as JSONObject
-          for (lessons_order in subjects.keys()) {
+          for (subject_order in subjects.keys()) {
             // tmp is either a String or JSONArray with size 2
             // Example:
             // either "subject name"
             // or ["numerator subject", "denominator subject"]
-            val tmp = subjects[lessons_order]
-            if (tmp !is JSONArray) continue
+            val tmp = subjects[subject_order]
+            if (tmp !is JSONArray) continue // Skip "String" subjects
             val subject_name = tmp[if (dnm) 1 else 0]
             val subject_TextView =
-              timetable[week_day_index][lessons_order.toInt()]
+              timetable[week_day_index][subject_order.toInt()]
             when (subject_name) {
               "" -> subject_TextView.visibility = View.GONE
               else -> {
-                subject_TextView.text = "$lessons_order. $subject_name"
+                subject_TextView.text = "$subject_order. $subject_name"
                 // Check the other string in array
                 if (tmp[if (!dnm) 1 else 0] as String === "")
                   subject_TextView.visibility = View.VISIBLE
@@ -201,16 +199,16 @@ class MainActivity : AppCompatActivity() {
           }
         }
 
-        val current_pair = utils.get_pair(current_time)
+        val current_lesson = utils.get_lesson(current_time)
         val current_recess = utils.get_recess(current_time)
         val is_recess_time = current_recess != null
-        val is_study_time = current_pair != null
+        val is_study_time = current_lesson != null
 
         // --------------------------|Color timetable|--------------------------
         // Color everything in default color
         for (week_day_TextViews in timetable) {
-          for (pair_TextView in week_day_TextViews) {
-            pair_TextView.setTextColor(getColor(default_color))
+          for (lesson_TextView in week_day_TextViews) {
+            lesson_TextView.setTextColor(getColor(default_color))
           }
         }
 
@@ -221,14 +219,14 @@ class MainActivity : AppCompatActivity() {
           val week_day_TextViews = timetable[week_day_index]
 
           // Color current day of the week
-          for (pair_TextView in week_day_TextViews) {
-            pair_TextView.setTextColor(getColor(current_day_color))
+          for (lesson_TextView in week_day_TextViews) {
+            lesson_TextView.setTextColor(getColor(current_day_color))
           }
 
-          // Color current pair
+          // Color current lesson
           if (is_study_time) {
-            val pair_TextView = week_day_TextViews[current_pair!!.pair]
-            pair_TextView.setTextColor(getColor(study_color))
+            val lesson_TextView = week_day_TextViews[current_lesson!!.lesson]
+            lesson_TextView.setTextColor(getColor(study_color))
           }
         }
         // --------------------------|Color timetable|--------------------------
@@ -242,7 +240,7 @@ class MainActivity : AppCompatActivity() {
         // Color current time periods
         if (is_study_time || is_recess_time) {
           val i = when {
-            is_study_time -> current_pair!!.time_period_index
+            is_study_time -> current_lesson!!.time_period_index
             else -> current_recess!!.time_period_index
           }
           val color = if (is_study_time) study_color else recess_color
@@ -250,18 +248,20 @@ class MainActivity : AppCompatActivity() {
         }
         // ----------------------------|Color time|-----------------------------
 
-        val lessons_time_left = utils.get_lesson_time_left(current_time)
+        val halfs_time_left = utils.get_half_time_left(current_time)
+        val time_until_next_half =
+          utils.get_time_until_next_half(current_time)
+        binding.halfTextView.text =
+          "Half's time left:      $halfs_time_left |" +
+                  " Time until next half:      $time_until_next_half"
+
+        val lessons_time_left = utils.get_lessons_time_left(current_time)
         val time_until_next_lesson =
           utils.get_time_until_next_lesson(current_time)
         binding.lessonTextView.text =
-          "Lesson's time left: $lessons_time_left |" +
+          "Lesson's time left:$lessons_time_left |" +
                   " Time until next lesson: $time_until_next_lesson"
 
-        val pairs_time_left = utils.get_pairs_time_left(current_time)
-        val time_until_next_pair = utils.get_time_until_next_pair(current_time)
-        binding.pairTextView.text =
-          "Pair's time left:    $pairs_time_left |" +
-                  " Time until next pair:      $time_until_next_pair"
 
         loop_handler.postDelayed(this, 10)
       }

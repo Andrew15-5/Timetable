@@ -8,7 +8,7 @@ import org.threeten.bp.temporal.WeekFields
 import java.util.*
 
 class Utils {
-  // Each line has 4 timings and represent nth pair ([1;6])
+  // Each line has 4 timings and represent nth lesson ([1;6])
   private val timings_str = arrayOf(
     "8:30", "9:15", "9:20", "10:05",
     "10:20", "11:05", "11:10", "11:55",
@@ -22,7 +22,7 @@ class Utils {
 
   init {
     val mutable_time_periods = mutableListOf<String>()
-    val group_by = 4 // Each pair has 4 timings
+    val group_by = 4 // Each lesson has 4 timings
     for (i in timings_str.indices step group_by) {
       val start = timings_str[i]
       val recess_start = timings_str[i + 1]
@@ -36,68 +36,69 @@ class Utils {
     time_periods = mutable_time_periods.toList()
   }
 
-  fun get_lesson_time_left(time: Time): String {
-    val timing_index = get_pair(time)?.timing_index
+  fun get_half_time_left(time: Time): String {
+    val timing_index = get_lesson(time)?.timing_index
     val study_time = timing_index != null
     return when {
       study_time -> timings[timing_index!! + 1].minus(time).short_format()
-      else -> "   --:--  "
+      else -> "     --:--  "
     }
   }
 
-  fun get_time_until_next_lesson(time: Time): String {
+  fun get_time_until_next_half(time: Time): String {
     val last_recess_end_time = timings.reversed()[1]
-    val pair_index = get_pair(time)?.timing_index
+    val lesson_index = get_lesson(time)?.timing_index
     val recess_index = get_recess(time)?.timing_index
     val start_time = timings[0]
-    val study_time = pair_index != null
+    val study_time = lesson_index != null
     val other_time = when {
       time < start_time -> start_time
       time >= last_recess_end_time -> return "     --:--"
-      study_time -> timings[pair_index!! + 2]
+      study_time -> timings[lesson_index!! + 2]
       else -> timings[recess_index!! + 1]
     }
     return other_time.minus(time).short_format()
   }
 
-  fun get_pairs_time_left(time: Time): String {
-    val pair = get_pair(time)
-    val pair_index = pair?.timing_index
+  fun get_lessons_time_left(time: Time): String {
+    val lesson = get_lesson(time)
+    val lesson_index = lesson?.timing_index
     val recess = get_recess(time)
     val recess_index = recess?.timing_index
     val recess_time = recess != null
-    val timing_index = pair_index ?: recess_index
+    val timing_index = lesson_index ?: recess_index
     val not_study_or_recess_time = timing_index == null
     val other_time = when {
-      not_study_or_recess_time || recess_time && recess!!.is_between_pairs -> {
+      not_study_or_recess_time || recess_time && recess!!
+        .is_between_lessons -> {
         return "      --:--  "
       }
-      recess_time && recess!!.is_during_pair -> timings[recess_index!! + 2]
-      else -> when (pair!!.lesson) {
-        1 -> timings[pair_index!! + 3]
-        else -> timings[pair_index!! + 1]
+      recess_time && recess!!.is_during_lesson -> timings[recess_index!! + 2]
+      else -> when (lesson!!.half) {
+        1 -> timings[lesson_index!! + 3]
+        else -> timings[lesson_index!! + 1]
       }
     }
     return other_time.minus(time).short_format()
   }
 
-  fun get_time_until_next_pair(time: Time): String {
-    val last_recess_between_pairs_end = timings.reversed()[3]
-    val pair = get_pair(time)
-    val pair_index = pair?.timing_index
+  fun get_time_until_next_lesson(time: Time): String {
+    val last_recess_between_lessons_end = timings.reversed()[3]
+    val lesson = get_lesson(time)
+    val lesson_index = lesson?.timing_index
     val recess = get_recess(time)
     val recess_index = recess?.timing_index
     val start_time = timings[0]
-    val study_time = pair != null
+    val study_time = lesson != null
     val other_time = when {
       time < start_time -> start_time
-      time >= last_recess_between_pairs_end -> return "     --:--"
-      study_time -> when (pair!!.lesson) {
-        1 -> timings[pair_index!! + 4]
-        else -> timings[pair_index!! + 2]
+      time >= last_recess_between_lessons_end -> return "    --:--"
+      study_time -> when (lesson!!.half) {
+        1 -> timings[lesson_index!! + 4]
+        else -> timings[lesson_index!! + 2]
       }
       else -> when {
-        recess!!.is_during_pair -> timings[recess_index!! + 3]
+        recess!!.is_during_lesson -> timings[recess_index!! + 3]
         else -> timings[recess_index!! + 1]
       }
     }
@@ -184,20 +185,20 @@ class Utils {
     )
   }
 
-  fun get_pair(time: Time): Pair? {
+  fun get_lesson(time: Time): Lesson? {
     return when {
-      time.from_until(timings[0], timings[1]) -> Pair(1, 1)
-      time.from_until(timings[2], timings[3]) -> Pair(1, 2)
-      time.from_until(timings[4], timings[5]) -> Pair(2, 1)
-      time.from_until(timings[6], timings[7]) -> Pair(2, 2)
-      time.from_until(timings[8], timings[9]) -> Pair(3, 1)
-      time.from_until(timings[10], timings[11]) -> Pair(3, 2)
-      time.from_until(timings[12], timings[13]) -> Pair(4, 1)
-      time.from_until(timings[14], timings[15]) -> Pair(4, 2)
-      time.from_until(timings[16], timings[17]) -> Pair(5, 1)
-      time.from_until(timings[18], timings[19]) -> Pair(5, 2)
-      time.from_until(timings[20], timings[21]) -> Pair(6, 1)
-      time.from_until(timings[22], timings[23]) -> Pair(6, 2)
+      time.from_until(timings[0], timings[1]) -> Lesson(1, 1)
+      time.from_until(timings[2], timings[3]) -> Lesson(1, 2)
+      time.from_until(timings[4], timings[5]) -> Lesson(2, 1)
+      time.from_until(timings[6], timings[7]) -> Lesson(2, 2)
+      time.from_until(timings[8], timings[9]) -> Lesson(3, 1)
+      time.from_until(timings[10], timings[11]) -> Lesson(3, 2)
+      time.from_until(timings[12], timings[13]) -> Lesson(4, 1)
+      time.from_until(timings[14], timings[15]) -> Lesson(4, 2)
+      time.from_until(timings[16], timings[17]) -> Lesson(5, 1)
+      time.from_until(timings[18], timings[19]) -> Lesson(5, 2)
+      time.from_until(timings[20], timings[21]) -> Lesson(6, 1)
+      time.from_until(timings[22], timings[23]) -> Lesson(6, 2)
       else -> null
     }
   }
