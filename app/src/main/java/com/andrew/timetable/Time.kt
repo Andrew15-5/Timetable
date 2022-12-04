@@ -57,7 +57,7 @@ class Time {
   fun short_format(): String {
     return when {
       time.toHours() > 0 -> format("H:mm:ss")
-      else -> "   " + format("mm:ss")
+      else -> format("mm:ss")
     }
   }
 

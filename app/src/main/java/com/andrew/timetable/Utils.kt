@@ -8,6 +8,7 @@ import org.threeten.bp.temporal.WeekFields
 import java.util.*
 
 class Utils {
+  val no_time = "--:--"
   // Each line has 4 timings and represent nth lesson ([1;6])
   private val timings_str = arrayOf(
     "8:30", "9:15", "9:20", "10:05",
@@ -41,7 +42,7 @@ class Utils {
     val study_time = timing_index != null
     return when {
       study_time -> timings[timing_index!! + 1].minus(time).short_format()
-      else -> "     --:--  "
+      else -> no_time
     }
   }
 
@@ -53,7 +54,7 @@ class Utils {
     val study_time = lesson_index != null
     val other_time = when {
       time < start_time -> start_time
-      time >= last_recess_end_time -> return "     --:--"
+      time >= last_recess_end_time -> return no_time
       study_time -> timings[lesson_index!! + 2]
       else -> timings[recess_index!! + 1]
     }
@@ -71,7 +72,7 @@ class Utils {
     val other_time = when {
       not_study_or_recess_time || recess_time && recess!!
         .is_between_lessons -> {
-        return "      --:--  "
+        return no_time
       }
       recess_time && recess!!.is_during_lesson -> timings[recess_index!! + 2]
       else -> when (lesson!!.half) {
@@ -92,7 +93,7 @@ class Utils {
     val study_time = lesson != null
     val other_time = when {
       time < start_time -> start_time
-      time >= last_recess_between_lessons_end -> return "    --:--"
+      time >= last_recess_between_lessons_end -> return no_time
       study_time -> when (lesson!!.half) {
         1 -> timings[lesson_index!! + 4]
         else -> timings[lesson_index!! + 2]

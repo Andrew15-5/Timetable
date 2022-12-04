@@ -88,9 +88,8 @@ class TimeTest {
 
   @Test
   fun test_short_format() {
-    val prefix = "   "
     arrayOf("0:0", "0:00", "00:0", "00:00").forEach { hhmm ->
-      assertEquals(prefix + "00:00", Time.from_hhmm(hhmm).short_format())
+      assertEquals("00:00", Time.from_hhmm(hhmm).short_format())
     }
     mapOf(
       "01:00" to "0:1",
@@ -112,10 +111,7 @@ class TimeTest {
       "59:00" to "24:59",
       "1:00:00" to "24:60",
       "4:39:00" to "99:99",
-    ).forEach { (x, y) ->
-      val expected = if (x.length <= 5) prefix + x else x
-      assertEquals(expected, Time.from_hhmm(y).short_format())
-    }
+    ).forEach { (x, y) -> assertEquals(x, Time.from_hhmm(y).short_format()) }
   }
 
   @Test

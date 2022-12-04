@@ -6,15 +6,16 @@ import java.time.Month
 
 class UtilsTest {
   val utils = Utils()
+  val no_time = utils.no_time
 
-  class NoTime {
-    companion object {
-      const val get_half_time_left = "     --:--  "
-      const val get_lessons_time_left = "      --:--  "
-      const val get_time_until_next_half = "     --:--"
-      const val get_time_until_next_lesson = "    --:--"
-    }
-  }
+  fun get_time_until_next_half(time: Time) =
+    utils.get_time_until_next_half(time)
+
+  fun get_lessons_time_left(time: Time) =
+    utils.get_lessons_time_left(time)
+
+  fun get_time_until_next_lesson(time: Time) =
+    utils.get_time_until_next_lesson(time)
 
   fun get_time(timing_index: Int): Time {
     return utils.timings[timing_index]
@@ -39,10 +40,7 @@ class UtilsTest {
       "22:22",
       "23:59"
     ).forEach { hhmm ->
-      assertEquals(
-        NoTime.get_half_time_left,
-        utils.get_half_time_left(Time.from_hhmm(hhmm))
-      )
+      assertEquals(no_time, utils.get_half_time_left(Time.from_hhmm(hhmm)))
     }
   }
 
@@ -56,10 +54,7 @@ class UtilsTest {
         "0:03",
         "0:04"
       ).forEach { offset ->
-        assertEquals(
-          NoTime.get_half_time_left,
-          utils.get_half_time_left(get_time(i, offset))
-        )
+        assertEquals(no_time, utils.get_half_time_left(get_time(i, offset)))
       }
     }
   }
@@ -92,7 +87,7 @@ class UtilsTest {
     ).forEach { (x, y) ->
       assertEquals(
         expected_time(x),
-        utils.get_time_until_next_half(Time.from_hhmm(y))
+        get_time_until_next_half(Time.from_hhmm(y))
       )
     }
   }
@@ -102,8 +97,7 @@ class UtilsTest {
     val last_index = utils.timings.size - 1
     for (i in 1 downTo 0) {
       assertEquals(
-        NoTime.get_time_until_next_half,
-        utils.get_time_until_next_half(get_time(last_index - i))
+        no_time, get_time_until_next_half(get_time(last_index - i))
       )
     }
     arrayOf(
@@ -111,10 +105,7 @@ class UtilsTest {
       "22:22",
       "23:59"
     ).forEach { hhmm ->
-      assertEquals(
-        NoTime.get_time_until_next_half,
-        utils.get_time_until_next_half(Time.from_hhmm(hhmm))
-      )
+      assertEquals(no_time, get_time_until_next_half(Time.from_hhmm(hhmm)))
     }
   }
 
@@ -127,10 +118,7 @@ class UtilsTest {
         "0:28" to "0:22",
         "0:06" to "0:44",
       ).forEach { (x, y) ->
-        assertEquals(
-          expected_time(x),
-          utils.get_time_until_next_half(get_time(i, y))
-        )
+        assertEquals(expected_time(x), get_time_until_next_half(get_time(i, y)))
       }
     }
   }
@@ -159,10 +147,7 @@ class UtilsTest {
           "0:16" to "0:44",
         )
       }.forEach { (x, y) ->
-        assertEquals(
-          expected_time(x),
-          utils.get_time_until_next_half(get_time(i, y))
-        )
+        assertEquals(expected_time(x), get_time_until_next_half(get_time(i, y)))
       }
     }
   }
@@ -176,10 +161,7 @@ class UtilsTest {
         "0:03" to "0:02",
         "0:01" to "0:04",
       ).forEach { (x, y) ->
-        assertEquals(
-          expected_time(x),
-          utils.get_time_until_next_half(get_time(i, y))
-        )
+        assertEquals(expected_time(x), get_time_until_next_half(get_time(i, y)))
       }
     }
   }
@@ -208,10 +190,7 @@ class UtilsTest {
           "0:01" to "0:14",
         )
       }.forEach { (x, y) ->
-        assertEquals(
-          expected_time(x),
-          utils.get_time_until_next_half(get_time(i, y))
-        )
+        assertEquals(expected_time(x), get_time_until_next_half(get_time(i, y)))
       }
     }
   }
@@ -228,10 +207,7 @@ class UtilsTest {
       "22:22",
       "23:59"
     ).forEach { hhmm ->
-      assertEquals(
-        NoTime.get_lessons_time_left,
-        utils.get_lessons_time_left(Time.from_hhmm(hhmm))
-      )
+      assertEquals(no_time, get_lessons_time_left(Time.from_hhmm(hhmm)))
     }
   }
 
@@ -245,10 +221,7 @@ class UtilsTest {
         "0:03",
         "0:04"
       ).forEach { offset ->
-        assertEquals(
-          NoTime.get_lessons_time_left,
-          utils.get_lessons_time_left(get_time(i, offset))
-        )
+        assertEquals(no_time, get_lessons_time_left(get_time(i, offset)))
       }
     }
   }
@@ -264,10 +237,7 @@ class UtilsTest {
         "0:48" to "0:02",
         "0:46" to "0:04",
       ).forEach { (x, y) ->
-        assertEquals(
-          expected_time(x),
-          utils.get_lessons_time_left(get_time(i, y))
-        )
+        assertEquals(expected_time(x), get_lessons_time_left(get_time(i, y)))
       }
     }
   }
@@ -281,10 +251,7 @@ class UtilsTest {
         "1:13" to "0:22",
         "0:51" to "0:44",
       ).forEach { (x, y) ->
-        assertEquals(
-          expected_time(x),
-          utils.get_lessons_time_left(get_time(i, y))
-        )
+        assertEquals(expected_time(x), get_lessons_time_left(get_time(i, y)))
       }
     }
   }
@@ -298,10 +265,7 @@ class UtilsTest {
         "0:23" to "0:22",
         "0:01" to "0:44",
       ).forEach { (x, y) ->
-        assertEquals(
-          expected_time(x),
-          utils.get_lessons_time_left(get_time(i, y))
-        )
+        assertEquals(expected_time(x), get_lessons_time_left(get_time(i, y)))
       }
     }
   }
@@ -317,7 +281,7 @@ class UtilsTest {
     ).forEach { (x, y) ->
       assertEquals(
         expected_time(x),
-        utils.get_time_until_next_lesson(Time.from_hhmm(y))
+        get_time_until_next_lesson(Time.from_hhmm(y))
       )
     }
   }
@@ -327,8 +291,8 @@ class UtilsTest {
     val last_index = utils.timings.size - 1
     for (i in 3 downTo 0) {
       assertEquals(
-        NoTime.get_time_until_next_lesson,
-        utils.get_time_until_next_lesson(get_time(last_index - i))
+        no_time,
+        get_time_until_next_lesson(get_time(last_index - i))
       )
     }
     arrayOf(
@@ -336,10 +300,7 @@ class UtilsTest {
       "22:22",
       "23:59"
     ).forEach { hhmm ->
-      assertEquals(
-        NoTime.get_time_until_next_lesson,
-        utils.get_time_until_next_lesson(Time.from_hhmm(hhmm))
-      )
+      assertEquals(no_time, get_time_until_next_lesson(Time.from_hhmm(hhmm)))
     }
   }
 
@@ -369,7 +330,7 @@ class UtilsTest {
       }.forEach { (x, y) ->
         assertEquals(
           expected_time(x),
-          utils.get_time_until_next_lesson(get_time(i, y))
+          get_time_until_next_lesson(get_time(i, y))
         )
       }
     }
@@ -401,7 +362,7 @@ class UtilsTest {
       }.forEach { (x, y) ->
         assertEquals(
           expected_time(x),
-          utils.get_time_until_next_lesson(get_time(i, y))
+          get_time_until_next_lesson(get_time(i, y))
         )
       }
     }
@@ -433,7 +394,7 @@ class UtilsTest {
       }.forEach { (x, y) ->
         assertEquals(
           expected_time(x),
-          utils.get_time_until_next_lesson(get_time(i, y))
+          get_time_until_next_lesson(get_time(i, y))
         )
       }
     }
@@ -465,7 +426,7 @@ class UtilsTest {
       }.forEach { (x, y) ->
         assertEquals(
           expected_time(x),
-          utils.get_time_until_next_lesson(get_time(i, y))
+          get_time_until_next_lesson(get_time(i, y))
         )
       }
     }

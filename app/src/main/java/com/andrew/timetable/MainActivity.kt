@@ -251,17 +251,14 @@ class MainActivity : AppCompatActivity() {
         val halfs_time_left = utils.get_half_time_left(current_time)
         val time_until_next_half =
           utils.get_time_until_next_half(current_time)
-        binding.halfTextView.text =
-          "Half's time left:      $halfs_time_left |" +
-                  " Time until next half:      $time_until_next_half"
-
         val lessons_time_left = utils.get_lessons_time_left(current_time)
         val time_until_next_lesson =
           utils.get_time_until_next_lesson(current_time)
-        binding.lessonTextView.text =
-          "Lesson's time left:$lessons_time_left |" +
-                  " Time until next lesson: $time_until_next_lesson"
 
+        binding.halfsTimeLeftTextView.text = halfs_time_left
+        binding.timeUntilNextHalfTextView.text = time_until_next_half
+        binding.lessonsTimeLeftTextView.text = lessons_time_left
+        binding.timeUntilNextLessonTextView.text = time_until_next_lesson
 
         loop_handler.postDelayed(this, 10)
       }
