@@ -39,6 +39,9 @@ class MainActivity : AppCompatActivity() {
       val width = RelativeLayout.LayoutParams.WRAP_CONTENT
       val height = RelativeLayout.LayoutParams.WRAP_CONTENT
       layoutParams = RelativeLayout.LayoutParams(width, height)
+      // Note: If color of the week day was changed from default, then
+      // repopulation with default color is visible when switching between
+      // timetable configs. Solution: Remember the color of each line.
       setTextColor(getColor(default_color))
       includeFontPadding = false
       textSize = TEXT_SIZE
