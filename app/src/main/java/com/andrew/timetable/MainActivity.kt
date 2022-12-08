@@ -227,8 +227,9 @@ class MainActivity : AppCompatActivity() {
           }
 
           // Color current lesson
-          if (is_study_time) {
-            val lesson_TextView = week_day_TextViews[current_lesson!!.lesson]
+          val lesson_number = current_lesson?.lesson
+          if (is_study_time && week_day_TextViews.size > lesson_number!!) {
+            val lesson_TextView = week_day_TextViews[lesson_number]
             lesson_TextView.setTextColor(getColor(study_color))
           }
         }
