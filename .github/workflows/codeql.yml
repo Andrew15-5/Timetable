@@ -2,10 +2,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches: ["master"]
+    branches: ["dev", "master"]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: ["master"]
+    branches: ["dev", "master"]
   schedule:
     - cron: "21 0 * * 0"
 
@@ -40,9 +40,8 @@ jobs:
       # Only maintainer has signing key, therefore on other machines build.gradle will cause
       # an error. I don't know if there is an option to disable signing without modifying
       # config file. This has to be run before the "Autobuild".
-      - run: |
-          echo "Removing signing configuration"
-          sed -i '/^    signingConfigs/,/^    }/d;/signingConfig/d' app/build.gradle
+      - name: Removing Gradle's APK signing configuration
+        run: sed -i '/^    signingConfigs/,/^    }/d;/signingConfig/d' app/build.gradle
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v2
