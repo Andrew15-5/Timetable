@@ -115,7 +115,14 @@ class MainActivity : AppCompatActivity() {
     // 3.2. ["Numerator subject", ""] -
     //      "Numerator subject" on numerator week,
     //      no nth subject on denominator week
-    val config_names = arrayOf("IMK4_5s.json", "IMK4_5s_custom.json")
+    // Note: instead of empty "" you can use "—" or anything else. This is
+    // useful for intermediate (non-last) pairs which will not disappear with ""
+    // unlike the last pair.
+    val semester = 6
+    val config_names = arrayOf(
+      "IMK4_${semester}s.json",
+      "IMK4_${semester}s_custom.json"
+    )
 
     val timetable_configs = TimetableConfigs(assets, config_names, 1)
     val timetable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
