@@ -15,7 +15,11 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="?attr/background"
+            android:theme="@style/Theme.Timetable.Toolbar"
+            app:popupTheme="@style/Theme.Timetable.Toolbar.Popup"
+            app:titleTextColor="?attr/titleTextColor" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

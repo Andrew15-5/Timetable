@@ -65,7 +65,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/halfs_time_left"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
 
                         <TextView
@@ -74,7 +74,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textAlignment="viewEnd"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
                     </LinearLayout>
 
@@ -87,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/lessons_time_left"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
 
                         <TextView
@@ -97,7 +97,7 @@
                             android:layout_weight="1"
                             android:minWidth="44sp"
                             android:textAlignment="viewEnd"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
                     </LinearLayout>
 
@@ -112,14 +112,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/bottom_times_delimiter"
-                        android:textColor="@color/purple"
+                        android:textColor="@color/left_until_color"
                         android:textSize="@dimen/text_size" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/bottom_times_delimiter"
-                        android:textColor="@color/purple"
+                        android:textColor="@color/left_until_color"
                         android:textSize="@dimen/text_size" />
                 </LinearLayout>
 
@@ -138,7 +138,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/time_until_next_half"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
 
                         <TextView
@@ -147,7 +147,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textAlignment="viewEnd"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
                     </LinearLayout>
 
@@ -160,7 +160,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/time_until_next_lesson"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
 
                         <TextView
@@ -169,7 +169,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textAlignment="viewEnd"
-                            android:textColor="@color/purple"
+                            android:textColor="@color/left_until_color"
                             android:textSize="@dimen/text_size" />
                     </LinearLayout>
                 </LinearLayout>

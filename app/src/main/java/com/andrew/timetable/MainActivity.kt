@@ -20,12 +20,6 @@ class MainActivity : AppCompatActivity() {
   private val utils = Utils()
   private val time_periods = utils.time_periods
 
-  // Color aliases
-  private val default_color = green
-  private val current_day_color = yellow
-  private val recess_color = current_day_color
-  private val study_color = red
-
   private lateinit var binding: ActivityMainBinding
   private lateinit var app_bar_binding: AppBarMainBinding
 
