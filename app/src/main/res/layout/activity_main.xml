@@ -19,17 +19,6 @@
             android:layout_marginEnd="@dimen/start_end_margin"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/timeAndWeekTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:width="100dp"
-                android:background="@null"
-                android:maxLines="1"
-                android:textAlignment="viewEnd"
-                android:textColor="@color/time_and_week"
-                tools:ignore="Autofill,LabelFor" />
-
             <LinearLayout
                 android:id="@+id/subjectsLayout"
                 android:layout_width="match_parent"
@@ -40,7 +29,6 @@
                 android:id="@+id/timeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
                 android:gravity="center_horizontal"
                 android:orientation="vertical" />
 

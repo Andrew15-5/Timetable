@@ -18,8 +18,17 @@
             android:layout_height="wrap_content"
             android:background="?attr/background"
             android:theme="@style/Theme.Timetable.Toolbar"
-            app:popupTheme="@style/Theme.Timetable.Toolbar.Popup"
-            app:titleTextColor="?attr/titleTextColor" />
+            app:popupTheme="@style/Theme.Timetable.Toolbar.Popup">
+
+            <TextView
+                android:id="@+id/timeAndWeekTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textColor="?titleTextColor"
+                android:textSize="@dimen/title_text_size" />
+
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 

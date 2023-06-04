@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     binding = app_bar_binding.main
     val view = app_bar_binding.root
     setContentView(view)
-    binding.timeAndWeekTextView.textSize = TEXT_SIZE
+//    app_bar_binding.timeAndWeekTextView.textSize = TEXT_SIZE
     // Fully transparent navigation & status bars
 
 //    window.setFlags(
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     val toolbar = app_bar_binding.toolbar
     setSupportActionBar(toolbar)
-    supportActionBar?.title = "Timetable"
+    supportActionBar?.title = ""
 
     // JSON nth subject values:
     // 1. "Subject" - same "Subject" every week
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         val week_parity = if (dnm) "denominator" else "numerator"
         val last_week = 17
         val current_week = if (week in 1..last_week) week else "18+"
-        binding.timeAndWeekTextView.text =
+        app_bar_binding.timeAndWeekTextView.text =
           "week $current_week $formatted_time $week_parity"
 
         // Handle changes in timetable (numerator/denominator, visibility)
