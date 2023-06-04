@@ -1,60 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_main"
+    >
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/start_end_margin"
             android:layout_marginEnd="@dimen/start_end_margin"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <LinearLayout
                 android:id="@+id/subjectsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                />
 
             <LinearLayout
                 android:id="@+id/timeLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:baselineAligned="false"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    >
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        >
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/halfs_time_left"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
 
                         <TextView
                             android:id="@+id/halfsTimeLeftTextView"
@@ -63,20 +73,23 @@
                             android:layout_weight="1"
                             android:textAlignment="viewEnd"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        >
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/lessons_time_left"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
 
                         <TextView
                             android:id="@+id/lessonsTimeLeftTextView"
@@ -86,7 +99,8 @@
                             android:minWidth="44sp"
                             android:textAlignment="viewEnd"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -94,40 +108,46 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    >
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/bottom_times_delimiter"
                         android:textColor="@color/left_until_color"
-                        android:textSize="@dimen/text_size" />
+                        android:textSize="@dimen/text_size"
+                        />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/bottom_times_delimiter"
                         android:textColor="@color/left_until_color"
-                        android:textSize="@dimen/text_size" />
+                        android:textSize="@dimen/text_size"
+                        />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    >
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        >
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/time_until_next_half"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
 
                         <TextView
                             android:id="@+id/timeUntilNextHalfTextView"
@@ -136,20 +156,23 @@
                             android:layout_weight="1"
                             android:textAlignment="viewEnd"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        >
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/time_until_next_lesson"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
 
                         <TextView
                             android:id="@+id/timeUntilNextLessonTextView"
@@ -158,7 +181,8 @@
                             android:layout_weight="1"
                             android:textAlignment="viewEnd"
                             android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size" />
+                            android:textSize="@dimen/text_size"
+                            />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
