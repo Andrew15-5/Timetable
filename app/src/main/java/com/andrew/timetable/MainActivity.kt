@@ -4,15 +4,13 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.andrew.timetable.R.color.*
 import com.andrew.timetable.databinding.ActivityMainBinding
+import com.andrew.timetable.databinding.AppBarMainBinding
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -29,6 +27,7 @@ class MainActivity : AppCompatActivity() {
   private val study_color = red
 
   private lateinit var binding: ActivityMainBinding
+  private lateinit var app_bar_binding: AppBarMainBinding
 
   private fun create_TextView(
     text: String,
@@ -94,15 +93,21 @@ class MainActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    val view = binding.root
+    app_bar_binding = AppBarMainBinding.inflate(layoutInflater)
+    binding = app_bar_binding.main
+    val view = app_bar_binding.root
     setContentView(view)
     binding.timeAndWeekTextView.textSize = TEXT_SIZE
     // Fully transparent navigation & status bars
-    window.setFlags(
-      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-    )
+
+//    window.setFlags(
+//      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+//      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+//    )
+
+    val toolbar = app_bar_binding.toolbar
+    setSupportActionBar(toolbar)
+    supportActionBar?.title = "Timetable"
 
     // JSON nth subject values:
     // 1. "Subject" - same "Subject" every week
@@ -274,5 +279,11 @@ class MainActivity : AppCompatActivity() {
         loop_handler.postDelayed(this, 10)
       }
     })
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    menuInflater.inflate(R.menu.main, menu)
+    return true
   }
 }

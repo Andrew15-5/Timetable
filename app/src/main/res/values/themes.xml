@@ -21,7 +21,4 @@
     </style>
     <color name="green">#13C100</color>
     <color name="time_and_week">@color/black</color>
-    <color name="yellow">#D1CE13</color>
-    <color name="red">#C31717</color>
-    <color name="purple">#A219BA</color>
 </resources>
