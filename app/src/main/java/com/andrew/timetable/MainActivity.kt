@@ -1,6 +1,7 @@
 package com.andrew.timetable
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -276,8 +277,14 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    // Inflate the menu; this adds items to the action bar if it is present.
     menuInflater.inflate(R.menu.main, menu)
+    val settings_action_item = menu.findItem(R.id.settings_action)
+
+    settings_action_item.setOnMenuItemClickListener {
+      startActivity(Intent(this, SettingsActivity::class.java))
+      true
+    }
+
     return true
   }
 }
