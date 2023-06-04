@@ -39,151 +39,163 @@
                 />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:baselineAligned="false"
-                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
                 >
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/halfs_time_left"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
-
-                        <TextView
-                            android:id="@+id/halfsTimeLeftTextView"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAlignment="viewEnd"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/lessons_time_left"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
-
-                        <TextView
-                            android:id="@+id/lessonsTimeLeftTextView"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:minWidth="44sp"
-                            android:textAlignment="viewEnd"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     >
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/bottom_times_delimiter"
+                        android:text="@string/time_since_half_started"
                         android:textColor="@color/left_until_color"
                         android:textSize="@dimen/text_size"
                         />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/timeSinceHalfStartedTextView"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/bottom_times_delimiter"
+                        android:layout_weight="1"
+                        android:textAlignment="viewEnd"
                         android:textColor="@color/left_until_color"
                         android:textSize="@dimen/text_size"
                         />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     >
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
+                        android:text="@string/time_since_lesson_started"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/time_until_next_half"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
-
-                        <TextView
-                            android:id="@+id/timeUntilNextHalfTextView"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAlignment="viewEnd"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/timeSinceLessonStartedTextView"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        >
+                        android:layout_weight="1"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+                </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/time_until_next_lesson"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
 
-                        <TextView
-                            android:id="@+id/timeUntilNextLessonTextView"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAlignment="viewEnd"
-                            android:textColor="@color/left_until_color"
-                            android:textSize="@dimen/text_size"
-                            />
-                    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/halfs_time_left"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+
+                    <TextView
+                        android:id="@+id/halfsTimeLeftTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lessons_time_left"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+
+                    <TextView
+                        android:id="@+id/lessonsTimeLeftTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:minWidth="44sp"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time_until_next_half"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+
+                    <TextView
+                        android:id="@+id/timeUntilNextHalfTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time_until_next_lesson"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+
+                    <TextView
+                        android:id="@+id/timeUntilNextLessonTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

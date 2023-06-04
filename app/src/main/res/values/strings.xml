@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Timetable</string>
     <string name="bottom_times_delimiter">\ |\ </string>
+    <string name="time_since_half_started">Time since half started:</string>
+    <string name="time_since_lesson_started">Time since lesson started:</string>
     <string name="lessons_time_left">Lesson\'s time left:</string>
     <string name="time_until_next_half">Time until next half:</string>
     <string name="time_until_next_lesson">Time until next lesson:</string>
