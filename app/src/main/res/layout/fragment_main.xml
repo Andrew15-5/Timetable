@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/start_end_margin"
             android:layout_marginEnd="@dimen/start_end_margin"
+            android:paddingBottom="@dimen/bottom_padding"
             android:orientation="vertical"
             >
 
@@ -56,31 +57,6 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/time_since_half_started"
-                        android:textColor="@color/left_until_color"
-                        android:textSize="@dimen/text_size"
-                        />
-
-                    <TextView
-                        android:id="@+id/timeSinceHalfStartedTextView"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textAlignment="viewEnd"
-                        android:textColor="@color/left_until_color"
-                        android:textSize="@dimen/text_size"
-                        />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    >
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="@string/time_since_lesson_started"
                         android:textColor="@color/left_until_color"
                         android:textSize="@dimen/text_size"
@@ -106,13 +82,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/halfs_time_left"
+                        android:text="@string/time_since_half_started"
                         android:textColor="@color/left_until_color"
                         android:textSize="@dimen/text_size"
                         />
 
                     <TextView
-                        android:id="@+id/halfsTimeLeftTextView"
+                        android:id="@+id/timeSinceHalfStartedTextView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -157,13 +133,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/time_until_next_half"
+                        android:text="@string/halfs_time_left"
                         android:textColor="@color/left_until_color"
                         android:textSize="@dimen/text_size"
                         />
 
                     <TextView
-                        android:id="@+id/timeUntilNextHalfTextView"
+                        android:id="@+id/halfsTimeLeftTextView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -189,6 +165,31 @@
 
                     <TextView
                         android:id="@+id/timeUntilNextLessonTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAlignment="viewEnd"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time_until_next_half"
+                        android:textColor="@color/left_until_color"
+                        android:textSize="@dimen/text_size"
+                        />
+
+                    <TextView
+                        android:id="@+id/timeUntilNextHalfTextView"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
