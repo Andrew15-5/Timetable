@@ -7,12 +7,14 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.andrew.timetable.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
@@ -26,17 +28,33 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    setContentView(binding.root)
+    lifecycleScope.launch {
+      // log("Deleted database: ${deleteDatabase(getString(R.string.database_name))}")
+      val db = DatabaseHelper.instance(this@MainActivity)
+      val app_settingsDAO = db.app_settingsDAO()
+      val app_settings = app_settingsDAO.get()!!
+      update_timings(app_settings.timings)
 
-    setSupportActionBar(binding.toolbar)
-    fragment_manager = supportFragmentManager.findFragmentById(
-      R.id.navigationContainer
-    )?.childFragmentManager!!
+      binding = ActivityMainBinding.inflate(layoutInflater)
+      setContentView(binding.root)
 
-    nav_controller = findNavController(R.id.navigationContainer)
-    app_bar_configuration = AppBarConfiguration(nav_controller.graph)
-    setupActionBarWithNavController(nav_controller, app_bar_configuration)
+      setSupportActionBar(binding.toolbar)
+      fragment_manager = supportFragmentManager.findFragmentById(
+        R.id.navigationContainer
+      )?.childFragmentManager!!
+
+      nav_controller = findNavController(R.id.navigationContainer)
+      app_bar_configuration = AppBarConfiguration(nav_controller.graph)
+      setupActionBarWithNavController(nav_controller, app_bar_configuration)
+    }
+  }
+
+  private lateinit var _timings: Timings
+  val timings
+    get() = _timings
+
+  fun update_timings(timings: Timings) {
+    _timings = timings
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {

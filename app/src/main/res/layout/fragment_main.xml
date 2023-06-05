@@ -20,8 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/start_end_margin"
             android:layout_marginEnd="@dimen/start_end_margin"
-            android:paddingBottom="@dimen/bottom_padding"
             android:orientation="vertical"
+            android:paddingBottom="@dimen/bottom_padding"
             >
 
             <LinearLayout
@@ -49,6 +49,7 @@
                 >
 
                 <LinearLayout
+                    android:id="@+id/timeSinceLessonStarted"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -74,6 +75,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/timeSinceHalfStarted"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -99,6 +101,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/lessonsTimeLeft"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -125,6 +128,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/halfsTimeLeft"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -150,6 +154,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/timeUntilNextLesson"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -175,6 +180,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/timeUntilNextHalf"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"

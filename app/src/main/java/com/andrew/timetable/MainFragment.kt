@@ -32,6 +32,13 @@ class MainFragment : Fragment() {
       set_text_of_timeAndWeekTextView(text)
   }
 
+  private val timings: Timings?
+    get() = (activity?.run {
+      val fragment = this@MainFragment.javaClass
+      if ((this as MainActivity).is_attached(fragment)) timings
+      else null
+    })
+
   private fun create_TextView(
     text: String,
     parent_layout: ViewGroup
@@ -275,23 +282,41 @@ class MainFragment : Fragment() {
         }
         // ----------------------------|Color time|-----------------------------
 
-        val time_since_half_started =
-          utils.get_time_since_half_started(current_time)
-        val halfs_time_left = utils.get_half_time_left(current_time)
-        val time_until_next_half =
-          utils.get_time_until_next_half(current_time)
         val time_since_lesson_started =
           utils.get_time_since_lesson_started(current_time)
+        val time_since_half_started =
+          utils.get_time_since_half_started(current_time)
+
         val lessons_time_left = utils.get_lessons_time_left(current_time)
+        val halfs_time_left = utils.get_half_time_left(current_time)
+
         val time_until_next_lesson =
           utils.get_time_until_next_lesson(current_time)
+        val time_until_next_half =
+          utils.get_time_until_next_half(current_time)
 
-        binding.timeSinceHalfStartedTextView.text = time_since_half_started
-        binding.halfsTimeLeftTextView.text = halfs_time_left
-        binding.timeUntilNextHalfTextView.text = time_until_next_half
+        val visibility = mapOf(true to View.VISIBLE, false to View.GONE)
+        timings?.apply {
+          binding.timeSinceLessonStarted.visibility =
+            visibility[this.time_since_lesson_started]!!
+          binding.timeSinceHalfStarted.visibility =
+            visibility[this.time_since_half_started]!!
+          binding.lessonsTimeLeft.visibility =
+            visibility[this.lessons_time_left]!!
+          binding.halfsTimeLeft.visibility =
+            visibility[this.halfs_time_left]!!
+          binding.timeUntilNextLesson.visibility =
+            visibility[this.time_until_next_lesson]!!
+          binding.timeUntilNextHalf.visibility =
+            visibility[this.time_until_next_half]!!
+        }
+
         binding.timeSinceLessonStartedTextView.text = time_since_lesson_started
+        binding.timeSinceHalfStartedTextView.text = time_since_half_started
         binding.lessonsTimeLeftTextView.text = lessons_time_left
+        binding.halfsTimeLeftTextView.text = halfs_time_left
         binding.timeUntilNextLessonTextView.text = time_until_next_lesson
+        binding.timeUntilNextHalfTextView.text = time_until_next_half
 
         loop_handler.postDelayed(this, 10)
       }
