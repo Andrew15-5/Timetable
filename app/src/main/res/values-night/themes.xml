@@ -75,6 +75,9 @@
         <!--        <item name="android:textColor">@color/cyan</item>-->
     </style>
 
+    <style name="Theme.Timetable.AlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">?backgroundColor</item>
+    </style>
 
     <color name="time_and_week">#00FFFF</color>
     <color name="default_color">#00FF00</color>

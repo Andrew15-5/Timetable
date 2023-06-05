@@ -11,7 +11,9 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.andrew.timetable.databinding.FragmentMainBinding
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
@@ -26,18 +28,14 @@ class MainFragment : Fragment() {
   private var study_color: Int = 0
   private var recess_color: Int = 0
   private lateinit var binding: FragmentMainBinding
+  private lateinit var app_settingsDAO: AppSettingsDAO
 
   private fun set_text_of_timeAndWeekTextView(text: String) = activity?.run {
     if ((this as MainActivity).is_attached(this@MainFragment.javaClass))
       set_text_of_timeAndWeekTextView(text)
   }
 
-  private val timings: Timings?
-    get() = (activity?.run {
-      val fragment = this@MainFragment.javaClass
-      if ((this as MainActivity).is_attached(fragment)) timings
-      else null
-    })
+  private suspend fun timings() = app_settingsDAO.get()!!.timings
 
   private fun create_TextView(
     text: String,
@@ -111,11 +109,25 @@ class MainFragment : Fragment() {
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+
     val activity = requireActivity()
+
+    lifecycleScope.launch {
+      app_settingsDAO = DatabaseHelper.instance(activity).app_settingsDAO()
+    }
+
     default_color = activity.getColor(R.color.default_color)
     current_day_color = activity.getColor(R.color.current_day_color)
     study_color = activity.getColor(R.color.study_color)
     recess_color = activity.getColor(R.color.recess_color)
+
+    // Better to quickly show needed timings than hide unneeded <- more visible
+    binding.timeSinceLessonStarted.visibility = View.GONE
+    binding.timeSinceHalfStarted.visibility = View.GONE
+    binding.lessonsTimeLeft.visibility = View.GONE
+    binding.halfsTimeLeft.visibility = View.GONE
+    binding.timeUntilNextLesson.visibility = View.GONE
+    binding.timeUntilNextHalf.visibility = View.GONE
 
     // Fully transparent navigation & status bars
     // window.setFlags(
@@ -295,20 +307,22 @@ class MainFragment : Fragment() {
         val time_until_next_half =
           utils.get_time_until_next_half(current_time)
 
-        val visibility = mapOf(true to View.VISIBLE, false to View.GONE)
-        timings?.apply {
-          binding.timeSinceLessonStarted.visibility =
-            visibility[this.time_since_lesson_started]!!
-          binding.timeSinceHalfStarted.visibility =
-            visibility[this.time_since_half_started]!!
-          binding.lessonsTimeLeft.visibility =
-            visibility[this.lessons_time_left]!!
-          binding.halfsTimeLeft.visibility =
-            visibility[this.halfs_time_left]!!
-          binding.timeUntilNextLesson.visibility =
-            visibility[this.time_until_next_lesson]!!
-          binding.timeUntilNextHalf.visibility =
-            visibility[this.time_until_next_half]!!
+        lifecycleScope.launch {
+          val visibility = mapOf(true to View.VISIBLE, false to View.GONE)
+          timings().apply {
+            binding.timeSinceLessonStarted.visibility =
+              visibility[this.time_since_lesson_started]!!
+            binding.timeSinceHalfStarted.visibility =
+              visibility[this.time_since_half_started]!!
+            binding.lessonsTimeLeft.visibility =
+              visibility[this.lessons_time_left]!!
+            binding.halfsTimeLeft.visibility =
+              visibility[this.halfs_time_left]!!
+            binding.timeUntilNextLesson.visibility =
+              visibility[this.time_until_next_lesson]!!
+            binding.timeUntilNextHalf.visibility =
+              visibility[this.time_until_next_half]!!
+          }
         }
 
         binding.timeSinceLessonStartedTextView.text = time_since_lesson_started

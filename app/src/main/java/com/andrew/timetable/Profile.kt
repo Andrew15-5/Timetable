@@ -7,5 +7,4 @@ import androidx.room.PrimaryKey
 data class Profile(
   @PrimaryKey
   val name: String,
-) {
-}
+)

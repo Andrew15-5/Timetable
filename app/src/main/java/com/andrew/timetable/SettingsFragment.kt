@@ -12,14 +12,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
   lateinit var app_settings: AppSettings
   lateinit var app_settingsDAO: AppSettingsDAO
 
-  private fun update_timings(timings: Timings) {
-    activity?.run {
-      val fragment = this@SettingsFragment.javaClass
-      val activity = this as MainActivity
-      if (activity.is_attached(fragment)) activity.update_timings(timings)
-    }
-  }
-
   override fun onCreatePreferences(
     savedInstanceState: Bundle?,
     rootKey: String?,
@@ -73,7 +65,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     lifecycleScope.launch {
       app_settingsDAO.update(app_settings)
-      update_timings(app_settings.timings)
     }
 
     return super.onPreferenceTreeClick(preference)

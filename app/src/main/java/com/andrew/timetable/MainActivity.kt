@@ -1,12 +1,15 @@
 package com.andrew.timetable
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Environment
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +20,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.andrew.timetable.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
@@ -37,12 +41,19 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    val downloads_dir = File(
+      Environment.getExternalStoragePublicDirectory(
+        Environment.DIRECTORY_DOWNLOADS
+      ).toURI()
+    )
+    val app_name = applicationInfo.loadLabel(packageManager).toString()
+    backup_dir = File(downloads_dir, "$app_name backups")
+
     lifecycleScope.launch {
       // log("Deleted database: ${deleteDatabase(getString(R.string.database_name))}")
-      val db = DatabaseHelper.instance(this@MainActivity)
-      val app_settingsDAO = db.app_settingsDAO()
-      val app_settings = app_settingsDAO.get()!!
-      update_timings(app_settings.timings)
+
+      // Create instance from the very beginning to not waste time later
+      DatabaseHelper.instance(this@MainActivity)
 
       binding = ActivityMainBinding.inflate(layoutInflater)
       setContentView(binding.root)
@@ -51,14 +62,6 @@ class MainActivity : AppCompatActivity() {
       fragment_manager = supportFragmentManager.findFragmentById(
         R.id.navigationContainer
       )?.childFragmentManager!!
-
-      val downloads_dir = File(
-        Environment.getExternalStoragePublicDirectory(
-          Environment.DIRECTORY_DOWNLOADS
-        ).toURI()
-      )
-      val app_name = applicationInfo.loadLabel(packageManager).toString()
-      backup_dir = File(downloads_dir, "$app_name backups")
 
       nav_controller = findNavController(R.id.navigationContainer)
       app_bar_configuration = AppBarConfiguration(nav_controller.graph)
@@ -69,10 +72,6 @@ class MainActivity : AppCompatActivity() {
   private lateinit var _timings: Timings
   val timings
     get() = _timings
-
-  fun update_timings(timings: Timings) {
-    _timings = timings
-  }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.main, menu)
@@ -129,6 +128,44 @@ class MainActivity : AppCompatActivity() {
 
           snackbar.show()
         }
+        true
+      }
+      R.id.restore_action -> {
+        val list = backup_dir.list()
+        if (list == null || list.isEmpty()) {
+          make_snackbar(
+            "No backups to restore from",
+            Snackbar.LENGTH_LONG
+          ).show()
+          return true
+        }
+        val adapter =
+          ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
+        val snackbar = make_snackbar("Settings restored", Snackbar.LENGTH_SHORT)
+
+        val on_backup_file_selected = fun(
+          _: DialogInterface,
+          selected_index: Int,
+        ) {
+          val file_name = list[selected_index]
+          val file = File(backup_dir, file_name)
+          val restored_text = file.readText()
+
+          lifecycleScope.launch {
+            val db = DatabaseHelper.instance(this@MainActivity)
+            val app_settings =
+              Gson().fromJson(restored_text, AppSettings::class.java)
+            db.app_settingsDAO().update(app_settings)
+            snackbar.show()
+          }
+        }
+
+        AlertDialog
+          .Builder(this, R.style.Theme_Timetable_AlertDialog)
+          .setTitle("Which backup to restore from")
+          .setAdapter(adapter, on_backup_file_selected)
+          .create()
+          .show()
         true
       }
       else -> super.onOptionsItemSelected(item)
