@@ -41,7 +41,7 @@ class MainFragment : Fragment() {
 
   private fun create_TextView(
     text: String,
-    parent_layout: ViewGroup
+    parent_layout: ViewGroup,
   ): TextView {
     val text_view = TextView(activity)
     with(text_view) {
@@ -64,7 +64,7 @@ class MainFragment : Fragment() {
   private fun create_week_day_subject_table(
     text_view_list: MutableList<TextView>,
     timetable_config: JSONObject,
-    week_day: String
+    week_day: String,
   ) {
     val subjects: JSONObject = timetable_config[week_day] as JSONObject
     text_view_list += create_TextView(week_day, binding.subjectsLayout)
@@ -86,7 +86,7 @@ class MainFragment : Fragment() {
   private fun repopulate_SubjectLayout(
     timetable_configs: TimetableConfigs,
     timeTable: MutableList<MutableList<TextView>>,
-    config: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT
+    config: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT,
   ) {
     binding.subjectsLayout.removeAllViews()
     timeTable.forEach { it.clear() }
@@ -102,7 +102,7 @@ class MainFragment : Fragment() {
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     binding = FragmentMainBinding.inflate(inflater, container, false)
     return binding.root
