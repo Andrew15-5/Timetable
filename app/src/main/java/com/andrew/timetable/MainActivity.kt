@@ -2,21 +2,17 @@ package com.andrew.timetable
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.room.Room
 import com.andrew.timetable.databinding.ActivityMainBinding
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
@@ -29,40 +25,6 @@ class MainActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-
-    // Log.d("debug", "Deleted database: ${deleteDatabase(getString(R.string.database_name))}")
-    val db = Room.databaseBuilder(
-      this,
-      Database::class.java,
-      getString(R.string.database_name)
-    )
-      .fallbackToDestructiveMigration()
-      .build()
-
-    Log.d("debug", "before")
-    lifecycleScope.launch {
-      val profileDAO = db.profileDAO()
-      Log.d("debug", profileDAO.get_all().toString())
-      // profileDAO.delete_all()
-      Log.d("debug", profileDAO.get_all().toString())
-
-      val timings = Timings(
-        time_since_half_started_text_view = true,
-        halfs_time_left_text_view = true,
-        time_until_next_half_text_view = true,
-        time_since_lesson_started_text_view = true,
-        lessons_time_left_text_view = true,
-        time_until_next_lesson_text_view = true,
-      )
-      val profile = Profile("profile5", timings)
-
-      Log.d("debug", "New profile: ${profile.id}")
-      profileDAO.insert_all_and_update_id(profile)
-      Log.d("debug", "Updated profile: ${profile.id}")
-      Log.d("debug", profileDAO.get_all().map { it.id }.toString())
-    }
-    Log.d("debug", "after")
 
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
