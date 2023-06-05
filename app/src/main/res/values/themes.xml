@@ -2,10 +2,10 @@
     <!-- Base application theme. -->
     <style name="Theme.Timetable" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/green</item>
+        <item name="colorPrimary">@color/primary_light_theme</item>
         <item name="colorOnPrimary">@color/purple</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/red</item>
+        <item name="colorSecondary">?colorPrimary</item>
         <item name="colorSecondaryVariant">@color/yellow</item>
         <item name="colorOnSecondary">@color/blue</item>
 
@@ -29,7 +29,7 @@
 
     <style name="Theme.Timetable.Toolbar">
         <!--Background of Toolbar-->
-        <item name="background">@color/green</item>
+        <item name="background">?colorPrimary</item>
 
         <!--App name in Toolbar-->
         <item name="titleTextColor">@color/black</item>
