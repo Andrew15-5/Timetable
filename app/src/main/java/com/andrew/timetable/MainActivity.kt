@@ -3,6 +3,7 @@ package com.andrew.timetable
 import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.view.KeyEvent
@@ -50,18 +51,12 @@ class MainActivity : AppCompatActivity() {
       "${BuildConfig.APPLICATION_ID}.broadcast.app_settings_updated"
   }
 
-  private val backup_file_picker_launcher = registerForActivityResult(
-    ActivityResultContracts.GetContent()
-  ) { uri ->
-    if (uri == null) {
-      make_snackbar("No file was selected", Snackbar.LENGTH_LONG).show()
-      return@registerForActivityResult
-    }
+  private suspend fun read_text(uri: Uri): String? {
     val parcel_file_descriptor =
       contentResolver.openFileDescriptor(uri, "r", null)
     if (parcel_file_descriptor == null) {
-      make_snackbar("Problem with pfd", Snackbar.LENGTH_LONG).show()
-      return@registerForActivityResult
+      make_snackbar("Couldn't open file", Snackbar.LENGTH_LONG).show()
+      return null
     }
     val file_descriptor = parcel_file_descriptor.fileDescriptor
     val file_input_stream = FileInputStream(file_descriptor)
@@ -69,23 +64,34 @@ class MainActivity : AppCompatActivity() {
     val string_builder = StringBuilder()
     var line: String?
 
+    do {
+      line = withContext(Dispatchers.IO) {
+        buffered_reader.readLine()
+      }
+      if (line == null) break
+      if (string_builder.isNotEmpty()) string_builder.append('\n')
+      string_builder.append(line)
+    } while (true)
+    withContext(Dispatchers.IO) {
+      buffered_reader.close()
+      file_input_stream.close()
+    }
+    parcel_file_descriptor.close()
+    return string_builder.toString()
+  }
+
+  private val backup_file_picker_launcher = registerForActivityResult(
+    ActivityResultContracts.GetContent()
+  ) { uri ->
+    if (uri == null) {
+      make_snackbar("No file was selected", Snackbar.LENGTH_LONG).show()
+      return@registerForActivityResult
+    }
+
     val snackbar = make_snackbar("Settings restored", Snackbar.LENGTH_SHORT)
 
     lifecycleScope.launch {
-      do {
-        line = withContext(Dispatchers.IO) {
-          buffered_reader.readLine()
-        }
-        if (line == null) break
-        if (string_builder.isNotEmpty()) string_builder.append('\n')
-        string_builder.append(line)
-      } while (true)
-      withContext(Dispatchers.IO) {
-        buffered_reader.close()
-        file_input_stream.close()
-      }
-      parcel_file_descriptor.close()
-      val restored_text = string_builder.toString()
+      val restored_text = read_text(uri)
 
       val db = DatabaseHelper.instance(this@MainActivity)
       val app_settings = Gson().fromJson(restored_text, AppSettings::class.java)
