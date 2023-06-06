@@ -36,4 +36,5 @@
     <string name="pref_time_until_next_half">time_until_next_half</string>
     <string name="backup_settings">Make backup</string>
     <string name="restore_settings">Restore from backup</string>
+    <string name="restore_from_file">Restore from file</string>
 </resources>

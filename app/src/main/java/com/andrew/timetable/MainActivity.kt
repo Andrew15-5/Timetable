@@ -10,6 +10,7 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
@@ -24,11 +25,16 @@ import com.andrew.timetable.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
@@ -42,6 +48,55 @@ class MainActivity : AppCompatActivity() {
   companion object {
     const val BROADCAST_ACTION_APP_SETTINGS_UPDATED =
       "${BuildConfig.APPLICATION_ID}.broadcast.app_settings_updated"
+  }
+
+  private val backup_file_picker_launcher = registerForActivityResult(
+    ActivityResultContracts.GetContent()
+  ) { uri ->
+    if (uri == null) {
+      make_snackbar("No file was selected", Snackbar.LENGTH_LONG).show()
+      return@registerForActivityResult
+    }
+    val parcel_file_descriptor =
+      contentResolver.openFileDescriptor(uri, "r", null)
+    if (parcel_file_descriptor == null) {
+      make_snackbar("Problem with pfd", Snackbar.LENGTH_LONG).show()
+      return@registerForActivityResult
+    }
+    val file_descriptor = parcel_file_descriptor.fileDescriptor
+    val file_input_stream = FileInputStream(file_descriptor)
+    val buffered_reader = BufferedReader(InputStreamReader(file_input_stream))
+    val string_builder = StringBuilder()
+    var line: String?
+
+    val snackbar = make_snackbar("Settings restored", Snackbar.LENGTH_SHORT)
+
+    lifecycleScope.launch {
+      do {
+        line = withContext(Dispatchers.IO) {
+          buffered_reader.readLine()
+        }
+        if (line == null) break
+        if (string_builder.isNotEmpty()) string_builder.append('\n')
+        string_builder.append(line)
+      } while (true)
+      withContext(Dispatchers.IO) {
+        buffered_reader.close()
+        file_input_stream.close()
+      }
+      parcel_file_descriptor.close()
+      val restored_text = string_builder.toString()
+
+      val db = DatabaseHelper.instance(this@MainActivity)
+      val app_settings = Gson().fromJson(restored_text, AppSettings::class.java)
+      db.app_settingsDAO().update(app_settings)
+
+      LocalBroadcastManager
+        .getInstance(this@MainActivity)
+        .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
+
+      snackbar.show()
+    }
   }
 
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
@@ -177,6 +232,10 @@ class MainActivity : AppCompatActivity() {
           .setAdapter(adapter, on_backup_file_selected)
           .create()
           .show()
+        true
+      }
+      R.id.restore_from_file_action -> {
+        backup_file_picker_launcher.launch("application/json")
         true
       }
       else -> super.onOptionsItemSelected(item)
