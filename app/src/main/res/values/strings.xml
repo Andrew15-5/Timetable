@@ -34,6 +34,6 @@
     <string name="pref_time_since_half_started">time_since_half_started</string>
     <string name="pref_halfs_time_left">halfs_time_left</string>
     <string name="pref_time_until_next_half">time_until_next_half</string>
-    <string name="backup_settings">Backup settings</string>
-    <string name="restore_settings">Restore settings</string>
+    <string name="backup_settings">Make backup</string>
+    <string name="restore_settings">Restore from backup</string>
 </resources>
