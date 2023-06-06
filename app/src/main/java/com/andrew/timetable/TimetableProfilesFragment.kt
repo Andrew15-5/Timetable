@@ -22,16 +22,13 @@ class TimetableProfilesFragment : Fragment() {
 
   val broadcast_receiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-      log("receiving something")
       if (intent?.action == BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED) {
-        log("receiving timetable profiles update")
         update_profiles()
       }
     }
   }
 
   private fun update_profiles() {
-    log("updating")
     lifecycleScope.launch {
       profiles = timetable_profileDAO.get_all()
       if (profiles.isEmpty()) {
