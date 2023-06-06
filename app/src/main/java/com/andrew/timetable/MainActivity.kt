@@ -198,10 +198,9 @@ class MainActivity : AppCompatActivity() {
 
   fun make_snackbar(text: String, duration: Int): Snackbar {
     val typed_value = TypedValue()
-    theme.resolveAttribute(R.attr.backgroundColor, typed_value, true)
-    val background_color = typed_value.data
     theme.resolveAttribute(R.attr.colorOnPrimary, typed_value, true)
     val text_color = typed_value.data
+    val background_color = getColor(R.color.snackbar)
     val snack_bar = Snackbar
       .make(binding.root, text, duration)
       .setTextColor(text_color)

@@ -49,6 +49,7 @@
         <item name="android:windowBackground">?backgroundColor</item>
     </style>
 
+    <color name="snackbar">@color/white</color>
     <color name="time_and_week">#009BAC</color>
     <color name="default_color">#7EBA27</color>
     <color name="current_day_color">#F5A801</color>
