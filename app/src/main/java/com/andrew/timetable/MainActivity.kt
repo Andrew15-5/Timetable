@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
   private val current_fragment
     get() = fragment_manager.primaryNavigationFragment
   private lateinit var backup_dir: File
+  private lateinit var profile_dir: File
   private var menu: Menu? = null
 
   companion object {
@@ -148,6 +149,7 @@ class MainActivity : AppCompatActivity() {
     )
     val app_name = applicationInfo.loadLabel(packageManager).toString()
     backup_dir = File(downloads_dir, "$app_name backups")
+    profile_dir = File(downloads_dir, "$app_name profiles")
 
     lifecycleScope.launch {
       // Create instance from the very beginning to not waste time later
@@ -202,8 +204,26 @@ class MainActivity : AppCompatActivity() {
     binding.timeAndWeekTextView.text = text
   }
 
-  fun import_timetable_profile(){
+  fun import_timetable_profile() {
     timetable_profile_picker_launcher.launch("application/json")
+  }
+
+  fun backup_timetable_profile(timetable_profile: TimetableProfile) {
+    val app_name = applicationInfo.loadLabel(packageManager).toString()
+    val backup_file_name = "${app_name}_profile_${timetable_profile.name}.json"
+
+    val short_dir =
+      File(profile_dir.parentFile!!.name, backup_dir.name).absolutePath
+    val snackbar =
+      make_snackbar("Profile saved in $short_dir", Snackbar.LENGTH_LONG)
+
+    val backup_text = timetable_profile.toJSON()
+
+    if (!profile_dir.exists()) profile_dir.mkdir()
+    val file = File(profile_dir, backup_file_name)
+    file.writeText(backup_text)
+
+    snackbar.show()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {

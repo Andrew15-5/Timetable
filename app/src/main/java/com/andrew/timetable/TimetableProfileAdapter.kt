@@ -11,6 +11,7 @@ class TimetableProfileAdapter(
   private val context: Context,
   private val items: List<TimetableProfile>,
   private val on_delete_button_click: (String) -> View.OnClickListener,
+  private val on_export_button_click: (TimetableProfile) -> View.OnClickListener,
   private val on_edit_button_click: (TimetableProfile) -> View.OnClickListener,
 ) : BaseAdapter() {
 
@@ -48,6 +49,7 @@ class TimetableProfileAdapter(
     val item = items[position]
     binding.name.text = item.name
     binding.deleteButton.setOnClickListener(on_delete_button_click(item.name))
+    binding.exportButton.setOnClickListener(on_export_button_click(item))
     binding.editButton.setOnClickListener(on_edit_button_click(item))
     return item_view
   }

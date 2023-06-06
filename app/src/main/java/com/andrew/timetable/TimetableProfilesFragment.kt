@@ -45,6 +45,9 @@ class TimetableProfilesFragment : Fragment() {
     }
   }
 
+  private lateinit var on_export_button_click:
+    (TimetableProfile) -> View.OnClickListener
+
   private val on_edit_button_click =
     fun(timetable_profile: TimetableProfile): View.OnClickListener {
       return View.OnClickListener {
@@ -70,6 +73,7 @@ class TimetableProfilesFragment : Fragment() {
           requireActivity(),
           profiles,
           on_delete_button_click,
+          on_export_button_click,
           on_edit_button_click,
         )
     }
@@ -111,6 +115,13 @@ class TimetableProfilesFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     val activity = activity as MainActivity
+
+    on_export_button_click =
+      fun(timetable_profile: TimetableProfile): View.OnClickListener {
+        return View.OnClickListener {
+          activity.backup_timetable_profile(timetable_profile)
+        }
+      }
 
     val cancel_message = ThemedSnackbar.make(
       activity,
