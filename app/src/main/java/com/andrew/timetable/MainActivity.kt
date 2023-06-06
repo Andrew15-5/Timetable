@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     val snackbar = make_snackbar("Settings restored", Snackbar.LENGTH_SHORT)
 
     lifecycleScope.launch {
-      val restored_text = read_text(uri)
+      val restored_text = read_text(uri) ?: return@launch
 
       val db = DatabaseHelper.instance(this@MainActivity)
       val app_settings = Gson().fromJson(restored_text, AppSettings::class.java)
