@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
         val time_str = Instant.now().atZone(zone_id).format(iso_format)
           .replace(':', '-')
         val app_name = applicationInfo.loadLabel(packageManager).toString()
-        val backup_file_name = "${app_name}_settings_backup_${time_str}.json"
+        val backup_file_name = "${app_name}_backup_${time_str}.json"
 
         val dir =
           File(backup_dir.parentFile!!.name, backup_dir.name).absolutePath
