@@ -45,4 +45,9 @@
     <string name="edit">Edit</string>
     <string name="no_timetables">No timetables</string>
     <string name="import_timetable">Import timetable</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="editing_timetable_profile">Editing timetable profile</string>
+    <string name="name">Name:</string>
+    <string name="reset">Reset</string>
 </resources>

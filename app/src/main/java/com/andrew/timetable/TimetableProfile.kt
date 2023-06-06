@@ -34,6 +34,11 @@ data class TimetableProfile(
       )
     )
   }
+
+  fun pretty_timetable(): String? {
+    return GsonBuilder().setPrettyPrinting().create()
+      .toJson(Gson().fromJson(timetable.toString(), Map::class.java))
+  }
 }
 
 

@@ -1,5 +1,7 @@
 package com.andrew.timetable
 
+import android.app.Activity.RESULT_CANCELED
+import android.app.Activity.RESULT_OK
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -8,17 +10,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.andrew.timetable.MainActivity.Companion.BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED
 import com.andrew.timetable.databinding.FragmentTimetableProfilesBinding
 import kotlinx.coroutines.launch
+import com.andrew.timetable.Snackbar.Companion as ThemedSnackbar
+import com.google.android.material.snackbar.Snackbar as Snackbar
 
 class TimetableProfilesFragment : Fragment() {
   private lateinit var binding: FragmentTimetableProfilesBinding
   private lateinit var timetable_profileDAO: TimetableProfileDAO
   private var profiles: List<TimetableProfile> = listOf()
+  private lateinit var edit_launcher: ActivityResultLauncher<Intent>
+  private lateinit var edit_intent: Intent
 
   val broadcast_receiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -37,6 +45,16 @@ class TimetableProfilesFragment : Fragment() {
     }
   }
 
+  private val on_edit_button_click =
+    fun(timetable_profile: TimetableProfile): View.OnClickListener {
+      return View.OnClickListener {
+        val intent = Intent(edit_intent)
+        intent.putExtra("name", timetable_profile.name)
+        intent.putExtra("timetable", timetable_profile.timetable.toString())
+        edit_launcher.launch(intent)
+      }
+    }
+
   private fun update_profiles() {
     lifecycleScope.launch {
       profiles = timetable_profileDAO.get_all()
@@ -51,7 +69,8 @@ class TimetableProfilesFragment : Fragment() {
         TimetableProfileAdapter(
           requireActivity(),
           profiles,
-          on_delete_button_click
+          on_delete_button_click,
+          on_edit_button_click,
         )
     }
   }
@@ -91,8 +110,35 @@ class TimetableProfilesFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
     val activity = activity as MainActivity
+
+    val cancel_message = ThemedSnackbar.make(
+      activity,
+      binding.root,
+      "Editing was canceled, no changes were saved",
+      Snackbar.LENGTH_LONG
+    )
+
+    val ok_message = ThemedSnackbar.make(
+      activity,
+      binding.root,
+      "Timetable profile was updated",
+      Snackbar.LENGTH_SHORT
+    )
+
+    edit_intent = Intent(activity, EditTimetableProfileActivity::class.java)
+    edit_launcher = registerForActivityResult(
+      ActivityResultContracts.StartActivityForResult()
+    ) {
+      log("results: resultCode - ${it.resultCode}, data - ${it.data}")
+      if (it.resultCode == RESULT_OK) {
+        ok_message.show()
+        update_profiles()
+      } else if (it.resultCode == RESULT_CANCELED) {
+        cancel_message.show()
+      }
+    }
+
     binding.importTimetableButton.setOnClickListener {
       activity.import_timetable_profile()
     }

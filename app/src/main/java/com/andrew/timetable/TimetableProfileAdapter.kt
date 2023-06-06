@@ -11,6 +11,7 @@ class TimetableProfileAdapter(
   private val context: Context,
   private val items: List<TimetableProfile>,
   private val on_delete_button_click: (String) -> View.OnClickListener,
+  private val on_edit_button_click: (TimetableProfile) -> View.OnClickListener,
 ) : BaseAdapter() {
 
   override fun getCount(): Int {
@@ -47,6 +48,7 @@ class TimetableProfileAdapter(
     val item = items[position]
     binding.name.text = item.name
     binding.deleteButton.setOnClickListener(on_delete_button_click(item.name))
+    binding.editButton.setOnClickListener(on_edit_button_click(item))
     return item_view
   }
 }
