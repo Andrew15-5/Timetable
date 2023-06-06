@@ -30,7 +30,7 @@ class TimingsTypeConverter {
   }
 
   @TypeConverter
-  fun toTimings(timingsJson: String): Timings {
-    return gson.fromJson(timingsJson, Timings::class.java)
+  fun toTimings(timings_json: String): Timings {
+    return gson.fromJson(timings_json, Timings::class.java)
   }
 }
