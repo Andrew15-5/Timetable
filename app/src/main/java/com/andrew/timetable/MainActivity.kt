@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
   private val current_fragment
     get() = fragment_manager.primaryNavigationFragment
   private lateinit var backup_dir: File
-  private lateinit var menu: Menu
+  private var menu: Menu? = null
 
   companion object {
     const val BROADCAST_ACTION_APP_SETTINGS_UPDATED =
@@ -176,13 +176,11 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun settings_menu_item_visibility(show: Boolean) {
-    val menu_item = menu.findItem(R.id.settings_action)
-    menu_item.isVisible = show
+    menu?.findItem(R.id.settings_action)?.isVisible = show
   }
 
   fun timetable_profiles_menu_item_visibility(show: Boolean) {
-    val menu_item = menu.findItem(R.id.timetable_profiles_action)
-    menu_item.isVisible = show
+    menu?.findItem(R.id.timetable_profiles_action)?.isVisible = show
   }
 
   private var _is_timeAndWeekTextView_mutable = true
