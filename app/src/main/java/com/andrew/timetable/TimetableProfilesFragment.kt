@@ -17,9 +17,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.andrew.timetable.MainActivity.Companion.BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED
 import com.andrew.timetable.databinding.FragmentTimetableProfilesBinding
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import com.andrew.timetable.Snackbar.Companion as ThemedSnackbar
-import com.google.android.material.snackbar.Snackbar as Snackbar
 
 class TimetableProfilesFragment : Fragment() {
   private lateinit var binding: FragmentTimetableProfilesBinding

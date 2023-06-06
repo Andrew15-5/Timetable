@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
-import com.google.gson.internal.LinkedTreeMap
+import com.google.gson.GsonBuilder
 import org.json.JSONObject
 
 @Entity(tableName = "timetable_profiles")

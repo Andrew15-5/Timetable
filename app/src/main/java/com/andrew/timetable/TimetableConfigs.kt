@@ -6,7 +6,7 @@ import org.json.JSONObject
 class TimetableConfigs(
   assets: AssetManager,
   config_names: Array<String>,
-  initial_config_index: Int = 0
+  initial_config_index: Int = 0,
 ) {
   enum class Config {
     CURRENT, NEXT

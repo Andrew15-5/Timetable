@@ -251,10 +251,10 @@ class MainActivity : AppCompatActivity() {
         val app_name = applicationInfo.loadLabel(packageManager).toString()
         val backup_file_name = "${app_name}_backup_${time_str}.json"
 
-        val dir =
+        val short_dir =
           File(backup_dir.parentFile!!.name, backup_dir.name).absolutePath
         val snackbar =
-          make_snackbar("Backup saved in $dir", Snackbar.LENGTH_LONG)
+          make_snackbar("Backup saved in $short_dir", Snackbar.LENGTH_LONG)
 
         lifecycleScope.launch {
           val gson = GsonBuilder().setPrettyPrinting().create()
