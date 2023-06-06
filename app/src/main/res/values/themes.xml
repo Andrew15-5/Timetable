@@ -46,6 +46,7 @@
     </style>
 
     <style name="Theme.Timetable.AlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="colorPrimary">?colorOnPrimary</item>
         <item name="android:windowBackground">?backgroundColor</item>
     </style>
 
