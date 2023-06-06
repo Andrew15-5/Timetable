@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.andrew.timetable.MainActivity.Companion.BROADCAST_ACTION_APP_SETTINGS_UPDATED
+import com.andrew.timetable.MainActivity.Companion.BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED
 import com.andrew.timetable.databinding.FragmentMainBinding
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -28,6 +29,8 @@ class MainFragment : Fragment() {
   private val TEXT_SIZE = 16F // 18F
   private val utils = Utils()
   private val time_periods = utils.time_periods
+  private val timetable =
+    MutableList<MutableList<TextView>>(6) { mutableListOf() }
 
   private var default_color: Int = 0
   private var current_day_color: Int = 0
@@ -35,6 +38,8 @@ class MainFragment : Fragment() {
   private var recess_color: Int = 0
   private lateinit var binding: FragmentMainBinding
   private lateinit var app_settingsDAO: AppSettingsDAO
+  private lateinit var timetable_profileDAO: TimetableProfileDAO
+  private lateinit var timetable_configs: TimetableConfigs
 
   private fun set_text_of_timeAndWeekTextView(text: String) = activity?.run {
     if ((this as MainActivity).is_attached(this@MainFragment.javaClass))
@@ -48,12 +53,17 @@ class MainFragment : Fragment() {
       if (intent?.action == BROADCAST_ACTION_APP_SETTINGS_UPDATED) {
         update_timings_visibility()
       }
+      if (intent?.action == BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED) {
+        update_timetable_configs()
+      }
     }
   }
 
   override fun onResume() {
     super.onResume()
-    val intent_filter = IntentFilter(BROADCAST_ACTION_APP_SETTINGS_UPDATED)
+    val intent_filter = IntentFilter()
+    intent_filter.addAction(BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED)
+    intent_filter.addAction(BROADCAST_ACTION_APP_SETTINGS_UPDATED)
     LocalBroadcastManager.getInstance(requireContext())
       .registerReceiver(broadcast_receiver, intent_filter)
   }
@@ -113,16 +123,17 @@ class MainFragment : Fragment() {
     timeTable: MutableList<MutableList<TextView>>,
     config: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT,
   ) {
+    if (timetable_configs.isEmpty()) return
     binding.subjectsLayout.removeAllViews()
     timeTable.forEach { it.clear() }
-    for (week_day in
-    timetable_configs.get_config(config).keys().withIndex()) {
-      create_week_day_subject_table(
-        timeTable[week_day.index],
-        timetable_configs.get_current_config(),
-        week_day.value
-      )
-    }
+    timetable_configs.get_config(config)?.keys()?.withIndex()
+      ?.forEach { week_day ->
+        create_week_day_subject_table(
+          timeTable[week_day.index],
+          timetable_configs.get_current_config()!!,
+          week_day.value
+        )
+      }
   }
 
   override fun onCreateView(
@@ -154,15 +165,30 @@ class MainFragment : Fragment() {
     }
   }
 
-  @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
+  fun update_timetable_configs() {
+    lifecycleScope.launch {
+      val profiles = timetable_profileDAO.get_all()
+      if (profiles.isEmpty()) return@launch
+      timetable_configs.configs.clear()
+      timetable_configs.configs.addAll(profiles.map { it.timetable })
+      repopulate_SubjectLayout(timetable_configs, timetable)
+    }
+  }
+
+  @SuppressLint("ClickableViewAccessibility")
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     val activity = requireActivity()
 
+    timetable_configs = TimetableConfigs(activity.assets, arrayOf())
+
     lifecycleScope.launch {
-      app_settingsDAO = DatabaseHelper.instance(activity).app_settingsDAO()
+      val db = DatabaseHelper.instance(activity)
+      app_settingsDAO = db.app_settingsDAO()
+      timetable_profileDAO = db.timetable_profileDAO()
       update_timings_visibility()
+      update_timetable_configs()
     }
 
     default_color = activity.getColor(R.color.default_color)
@@ -198,16 +224,7 @@ class MainFragment : Fragment() {
     // Note: instead of empty "" you can use "—" or anything else. This is
     // useful for intermediate (non-last) pairs which will not disappear with ""
     // unlike the last pair.
-    val semester = 6
-    val config_names = arrayOf(
-      "IMK4_${semester}s.json",
-      "IMK4_${semester}s_custom.json"
-    )
 
-    val timetable_configs =
-      TimetableConfigs(activity.assets, config_names, 1)
-    val timetable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
-    repopulate_SubjectLayout(timetable_configs, timetable)
     binding.subjectsLayout.setOnTouchListener { _, event ->
       when (event.action) {
         MotionEvent.ACTION_DOWN -> {
@@ -229,6 +246,7 @@ class MainFragment : Fragment() {
     val calendar = Calendar.getInstance()
     val loop_handler = Handler(Looper.getMainLooper())
     loop_handler.post(object : Runnable {
+      @SuppressLint("SetTextI18n")
       override fun run() {
 
         utils.set_calendar_date_for_today(calendar)
@@ -267,30 +285,30 @@ class MainFragment : Fragment() {
 
         // Handle changes in timetable (numerator/denominator, visibility)
         val timetable_config = timetable_configs.get_current_config()
-        for ((week_day_index, week_day) in
-        timetable_config.keys().withIndex()) {
-          val subjects = timetable_config[week_day] as JSONObject
-          for (subject_order in subjects.keys()) {
-            // tmp is either a String or JSONArray with size 2
-            // Example:
-            // either "subject name"
-            // or ["numerator subject", "denominator subject"]
-            val tmp = subjects[subject_order]
-            if (tmp !is JSONArray) continue // Skip "String" subjects
-            val subject_name = tmp[if (dnm) 1 else 0]
-            val subject_TextView =
-              timetable[week_day_index][subject_order.toInt()]
-            when (subject_name) {
-              "" -> subject_TextView.visibility = View.GONE
-              else -> {
-                subject_TextView.text = "$subject_order. $subject_name"
-                // Check the other string in array
-                if (tmp[if (!dnm) 1 else 0] as String === "")
-                  subject_TextView.visibility = View.VISIBLE
+        timetable_config?.keys()?.withIndex()
+          ?.forEach { (week_day_index, week_day) ->
+            val subjects = timetable_config[week_day] as JSONObject
+            for (subject_order in subjects.keys()) {
+              // tmp is either a String or JSONArray with size 2
+              // Example:
+              // either "subject name"
+              // or ["numerator subject", "denominator subject"]
+              val tmp = subjects[subject_order]
+              if (tmp !is JSONArray) continue // Skip "String" subjects
+              val subject_name = tmp[if (dnm) 1 else 0]
+              val subject_TextView =
+                timetable[week_day_index][subject_order.toInt()]
+              when (subject_name) {
+                "" -> subject_TextView.visibility = View.GONE
+                else -> {
+                  subject_TextView.text = "$subject_order. $subject_name"
+                  // Check the other string in array
+                  if (tmp[if (!dnm) 1 else 0] as String === "")
+                    subject_TextView.visibility = View.VISIBLE
+                }
               }
             }
           }
-        }
 
         val current_lesson = utils.get_lesson(current_time)
         val current_recess = utils.get_recess(current_time)
