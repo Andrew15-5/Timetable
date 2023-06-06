@@ -34,6 +34,13 @@ class TimetableProfilesFragment : Fragment() {
     log("updating")
     lifecycleScope.launch {
       profiles = timetable_profileDAO.get_all()
+      if (profiles.isEmpty()) {
+        binding.timetableProfilesListView.visibility = View.GONE
+        binding.noTimetableProfiles.visibility = View.VISIBLE
+        return@launch
+      }
+      binding.timetableProfilesListView.visibility = View.VISIBLE
+      binding.noTimetableProfiles.visibility = View.GONE
       binding.timetableProfilesListView.adapter =
         TimetableProfileAdapter(requireActivity(), profiles)
     }
@@ -75,13 +82,14 @@ class TimetableProfilesFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val activity = requireActivity()
+    val activity = activity as MainActivity
+    binding.importTimetableButton.setOnClickListener {
+      activity.import_timetable_profile()
+    }
     lifecycleScope.launch {
       val db = DatabaseHelper.instance(activity)
       timetable_profileDAO = db.timetable_profileDAO()
-      profiles = timetable_profileDAO.get_all()
-      binding.timetableProfilesListView.adapter =
-        TimetableProfileAdapter(activity, profiles)
+      update_profiles()
     }
   }
 }

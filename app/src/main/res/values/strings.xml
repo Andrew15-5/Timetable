@@ -43,4 +43,6 @@
     <string name="delete">Delete</string>
     <string name="export">Export</string>
     <string name="edit">Edit</string>
+    <string name="no_timetables">No timetables</string>
+    <string name="import_timetable">Import timetable</string>
 </resources>

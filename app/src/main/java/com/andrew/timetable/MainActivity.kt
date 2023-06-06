@@ -202,6 +202,10 @@ class MainActivity : AppCompatActivity() {
     binding.timeAndWeekTextView.text = text
   }
 
+  fun import_timetable_profile(){
+    timetable_profile_picker_launcher.launch("application/json")
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     _is_timeAndWeekTextView_mutable = false
     return when (item.itemId) {
@@ -292,7 +296,7 @@ class MainActivity : AppCompatActivity() {
         true
       }
       R.id.import_timetable_profile_action -> {
-        timetable_profile_picker_launcher.launch("application/json")
+        import_timetable_profile()
         true
       }
       R.id.timetable_profiles_action -> {
