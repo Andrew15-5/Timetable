@@ -38,6 +38,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
     super.onPause()
   }
 
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+    (activity as MainActivity).settings_menu_item_visibility(false)
+  }
+
+  override fun onDetach() {
+    super.onDetach()
+    (activity as MainActivity).settings_menu_item_visibility(true)
+  }
+
+
   fun sync_preferences() = sync_preferences(null, false)
   fun sync_preferences(rootKey: String?, is_init: Boolean) {
     lifecycleScope.launch {

@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
   private val current_fragment
     get() = fragment_manager.primaryNavigationFragment
   private lateinit var backup_dir: File
+  private lateinit var menu: Menu
 
   companion object {
     const val BROADCAST_ACTION_APP_SETTINGS_UPDATED =
@@ -170,7 +171,13 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.main, menu)
+    this.menu = menu
     return true
+  }
+
+  fun settings_menu_item_visibility(show: Boolean) {
+    val menu_item = menu.findItem(R.id.settings_action)
+    menu_item.isVisible = show
   }
 
   private var _is_timeAndWeekTextView_mutable = true
