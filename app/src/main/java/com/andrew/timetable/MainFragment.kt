@@ -134,7 +134,6 @@ class MainFragment : Fragment() {
   }
 
   fun update_timings_visibility() {
-    log("update_timings_visibility()")
     val visibility = mapOf(true to View.VISIBLE, false to View.GONE)
     lifecycleScope.launch {
       timings = app_settingsDAO.get()!!.timings
