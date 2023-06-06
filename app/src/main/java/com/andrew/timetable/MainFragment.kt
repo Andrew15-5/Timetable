@@ -168,9 +168,19 @@ class MainFragment : Fragment() {
   fun update_timetable_configs() {
     lifecycleScope.launch {
       val profiles = timetable_profileDAO.get_all()
-      if (profiles.isEmpty()) return@launch
+
+      if (profiles.isEmpty()) {
+        binding.timetableProfileNameTextView.visibility = View.GONE
+        binding.noTimetableProfiles.visibility = View.VISIBLE
+        return@launch
+      }
+      binding.noTimetableProfiles.visibility = View.GONE
+      binding.timetableProfileNameTextView.visibility = View.VISIBLE
+
       timetable_configs.configs.clear()
       timetable_configs.configs.addAll(profiles.map { it.timetable })
+      timetable_configs.config_names.clear()
+      timetable_configs.config_names.addAll(profiles.map { it.name })
       repopulate_SubjectLayout(timetable_configs, timetable)
     }
   }
@@ -179,7 +189,7 @@ class MainFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    val activity = requireActivity()
+    val activity = activity as MainActivity
 
     timetable_configs = TimetableConfigs(activity.assets, arrayOf())
 
@@ -203,6 +213,10 @@ class MainFragment : Fragment() {
     binding.halfsTimeLeft.visibility = View.GONE
     binding.timeUntilNextLesson.visibility = View.GONE
     binding.timeUntilNextHalf.visibility = View.GONE
+
+    binding.importTimetableButton.setOnClickListener {
+      activity.import_timetable_profile()
+    }
 
     // Fully transparent navigation & status bars
     // window.setFlags(
@@ -284,6 +298,10 @@ class MainFragment : Fragment() {
         )
 
         // Handle changes in timetable (numerator/denominator, visibility)
+        val timetable_config_name = timetable_configs.get_current_config_name()
+        timetable_config_name?.apply {
+          binding.timetableProfileNameTextView.text = this
+        }
         val timetable_config = timetable_configs.get_current_config()
         timetable_config?.keys()?.withIndex()
           ?.forEach { (week_day_index, week_day) ->

@@ -14,6 +14,7 @@ class TimetableConfigs(
 
   private var current_config = initial_config_index
   val configs = mutableListOf<JSONObject>()
+  val config_names = mutableListOf<String>()
 
   init {
     for (config_name in config_names) {
@@ -24,6 +25,11 @@ class TimetableConfigs(
         }
       }
     }
+  }
+
+  fun get_current_config_name(): String? {
+    if (isEmpty()) return null
+    return config_names[current_config]
   }
 
   fun get_current_config(): JSONObject? {
