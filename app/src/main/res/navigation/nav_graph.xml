@@ -17,10 +17,33 @@
             app:destination="@id/settingsFragment"
             app:popUpTo="@id/mainFragment"
             />
+        <action
+            android:id="@+id/action_mainFragment_to_timetableProfilesFragment"
+            app:destination="@id/timetableProfilesFragment"
+            app:popUpTo="@id/mainFragment"
+            />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.andrew.timetable.SettingsFragment"
         android:label="Settings"
-        />
+        >
+        <action
+            android:id="@+id/action_settingsFragment_to_timetableProfilesFragment"
+            app:destination="@id/timetableProfilesFragment"
+            app:popUpTo="@id/mainFragment"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/timetableProfilesFragment"
+        android:name="com.andrew.timetable.TimetableProfilesFragment"
+        android:label="Timetable profiles"
+        tools:layout="@layout/fragment_timetable_profiles"
+        >
+        <action
+            android:id="@+id/action_timetableProfilesFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/mainFragment"
+            />
+    </fragment>
 </navigation>

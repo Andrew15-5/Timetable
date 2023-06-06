@@ -39,4 +39,5 @@
     <string name="restore_from_file">Restore from file</string>
     <string name="pref_restore_default_settings">restore_default_settings</string>
     <string name="import_timetable_profile">Import timetable profile</string>
+    <string name="timetable_profiles">Timetable profiles</string>
 </resources>

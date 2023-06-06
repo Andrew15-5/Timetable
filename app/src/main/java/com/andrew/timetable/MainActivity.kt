@@ -180,6 +180,11 @@ class MainActivity : AppCompatActivity() {
     menu_item.isVisible = show
   }
 
+  fun timetable_profiles_menu_item_visibility(show: Boolean) {
+    val menu_item = menu.findItem(R.id.timetable_profiles_action)
+    menu_item.isVisible = show
+  }
+
   private var _is_timeAndWeekTextView_mutable = true
   val is_timeAndWeekTextView_mutable
     get() = _is_timeAndWeekTextView_mutable
@@ -207,6 +212,8 @@ class MainActivity : AppCompatActivity() {
               clear_text_of_timeAndWeekTextView()
               R.id.action_mainFragment_to_settingsFragment
             }
+            is TimetableProfilesFragment ->
+              R.id.action_timetableProfilesFragment_to_settingsFragment
             else -> return true
           }
         )
@@ -286,6 +293,20 @@ class MainActivity : AppCompatActivity() {
       }
       R.id.import_timetable_profile_action -> {
         timetable_profile_picker_launcher.launch("application/json")
+        true
+      }
+      R.id.timetable_profiles_action -> {
+        nav_controller.navigate(
+          when (current_fragment) {
+            is MainFragment -> {
+              clear_text_of_timeAndWeekTextView()
+              R.id.action_mainFragment_to_timetableProfilesFragment
+            }
+            is SettingsFragment ->
+              R.id.action_settingsFragment_to_timetableProfilesFragment
+            else -> return true
+          }
+        )
         true
       }
       else -> super.onOptionsItemSelected(item)

@@ -34,4 +34,10 @@
         android:title="@string/restore_from_file"
         app:showAsAction="never"
         />
+    <item
+        android:id="@+id/timetable_profiles_action"
+        android:orderInCategory="6"
+        android:title="@string/timetable_profiles"
+        app:showAsAction="never"
+        />
 </menu>
