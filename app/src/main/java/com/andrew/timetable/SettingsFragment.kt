@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.Preference
@@ -40,16 +41,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
   fun sync_preferences() = sync_preferences(null, false)
   fun sync_preferences(rootKey: String?, is_init: Boolean) {
     lifecycleScope.launch {
-      val app_settings: AppSettings
-
-      if (is_init) {
-        val db = DatabaseHelper.instance(requireContext())
-        app_settingsDAO = db.app_settingsDAO()
-        app_settings = app_settingsDAO.get()!!
-        setPreferencesFromResource(R.xml.settings_screen, rootKey)
-      } else {
-        app_settings = app_settingsDAO.get()!!
-      }
+      val db = DatabaseHelper.instance(requireContext())
+      app_settingsDAO = db.app_settingsDAO()
+      val app_settings = app_settingsDAO.get()!!
+      if (is_init) init(rootKey)
 
       val t = app_settings.timings
       mapOf(
@@ -63,6 +58,44 @@ class SettingsFragment : PreferenceFragmentCompat() {
         findPreference<SwitchPreferenceCompat>(
           getString(str_res)
         )!!.isChecked = checked
+      }
+    }
+  }
+
+  fun init(rootKey: String?) {
+    lifecycleScope.launch {
+      setPreferencesFromResource(R.xml.settings_screen, rootKey)
+      val activity = requireActivity() as MainActivity
+      findPreference<Preference>(
+        getString(R.string.pref_restore_default_settings)
+      )!!.setOnPreferenceClickListener {
+        AlertDialog
+          .Builder(activity, R.style.Theme_Timetable_AlertDialog)
+          .setTitle(
+            "Are you sure? You should create a backup of your current settings"
+          )
+          .setPositiveButton("Yes") { _, _ ->
+            activity.deleteDatabase(getString(R.string.database_name))
+            DatabaseHelper.close()
+            lifecycleScope.launch {
+              DatabaseHelper.instance(activity)
+              LocalBroadcastManager
+                .getInstance(activity)
+                .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
+              Snackbar.make(
+                activity,
+                this@SettingsFragment.requireView(),
+                "Settings set to default",
+                Snackbar.LENGTH_SHORT
+              ).show()
+            }
+          }
+          .setNegativeButton("I'm not sure") { dialog, _ ->
+            dialog.cancel()
+          }
+          .create()
+          .show()
+        true
       }
     }
   }

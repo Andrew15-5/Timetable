@@ -53,4 +53,14 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Destructive settings">
+
+        <Preference
+            app:key="@string/pref_restore_default_settings"
+            app:summary="Everything will be set to default as if the app was freshly installed"
+            app:title="Restore default settings"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

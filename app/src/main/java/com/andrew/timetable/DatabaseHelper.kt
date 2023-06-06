@@ -20,6 +20,11 @@ class DatabaseHelper {
       return db as Database
     }
 
+    fun close() {
+      db?.close()
+      db = null
+    }
+
     private suspend fun is_initialized(): Boolean {
       return db!!.app_settingsDAO().get() != null
     }
