@@ -48,15 +48,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     (activity as MainActivity).settings_menu_item_visibility(true)
   }
 
-
-  fun sync_preferences() = sync_preferences(null, false)
-  fun sync_preferences(rootKey: String?, is_init: Boolean) {
+  fun sync_preferences() {
     lifecycleScope.launch {
       val db = DatabaseHelper.instance(requireContext())
       app_settingsDAO = db.app_settingsDAO()
       val app_settings = app_settingsDAO.get()!!
-      if (is_init) init(rootKey)
-
       val t = app_settings.timings
       mapOf(
         R.string.pref_time_since_lesson_started to t.time_since_lesson_started,
@@ -73,48 +69,49 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
   }
 
-  fun init(rootKey: String?) {
-    lifecycleScope.launch {
-      setPreferencesFromResource(R.xml.settings_screen, rootKey)
-      val activity = requireActivity() as MainActivity
-      findPreference<Preference>(
-        getString(R.string.pref_restore_default_settings)
-      )!!.setOnPreferenceClickListener {
-        AlertDialog
-          .Builder(activity, R.style.Theme_Timetable_AlertDialog)
-          .setTitle(
-            "Are you sure? You should create a backup of your current settings"
-          )
-          .setPositiveButton("Yes") { _, _ ->
-            activity.deleteDatabase(getString(R.string.database_name))
-            DatabaseHelper.close()
-            lifecycleScope.launch {
-              DatabaseHelper.instance(activity)
-              LocalBroadcastManager
-                .getInstance(activity)
-                .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
-              Snackbar.make(
-                activity,
-                this@SettingsFragment.requireView(),
-                "Settings set to default",
-                Snackbar.LENGTH_SHORT
-              ).show()
-            }
+  fun init_custom_preferences() {
+    val activity = activity as MainActivity
+    findPreference<Preference>(
+      getString(R.string.pref_restore_default_settings)
+    )!!.setOnPreferenceClickListener {
+      AlertDialog
+        .Builder(activity, R.style.Theme_Timetable_AlertDialog)
+        .setTitle(
+          "Are you sure? You should create a backup of your current settings"
+        )
+        .setPositiveButton("Yes") { _, _ ->
+          activity.deleteDatabase(getString(R.string.database_name))
+          DatabaseHelper.close()
+          lifecycleScope.launch {
+            DatabaseHelper.instance(activity)
+            LocalBroadcastManager
+              .getInstance(activity)
+              .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
+            Snackbar.make(
+              activity,
+              this@SettingsFragment.requireView(),
+              "Settings set to default",
+              Snackbar.LENGTH_SHORT
+            ).show()
           }
-          .setNegativeButton("I'm not sure") { dialog, _ ->
-            dialog.cancel()
-          }
-          .create()
-          .show()
-        true
-      }
+        }
+        .setNegativeButton("I'm not sure") { dialog, _ ->
+          dialog.cancel()
+        }
+        .create()
+        .show()
+      true
     }
   }
 
   override fun onCreatePreferences(
     savedInstanceState: Bundle?,
     rootKey: String?,
-  ) = sync_preferences(rootKey, true)
+  ) {
+    setPreferencesFromResource(R.xml.settings_screen, rootKey)
+    init_custom_preferences()
+    sync_preferences()
+  }
 
   override fun onPreferenceTreeClick(preference: Preference): Boolean {
     val time_since_lesson_started =
