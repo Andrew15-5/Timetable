@@ -112,8 +112,6 @@ class MainActivity : AppCompatActivity() {
     backup_dir = File(downloads_dir, "$app_name backups")
 
     lifecycleScope.launch {
-      // log("Deleted database: ${deleteDatabase(getString(R.string.database_name))}")
-
       // Create instance from the very beginning to not waste time later
       DatabaseHelper.instance(this@MainActivity)
 
