@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity() {
   companion object {
     const val BROADCAST_ACTION_APP_SETTINGS_UPDATED =
       "${BuildConfig.APPLICATION_ID}.broadcast.app_settings_updated"
+    const val BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED =
+      "${BuildConfig.APPLICATION_ID}.broadcast.timetable_profiles_updated"
   }
 
   private suspend fun read_text(uri: Uri): String? {
@@ -104,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
       LocalBroadcastManager
         .getInstance(this@MainActivity)
-        .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
+        .sendBroadcast(Intent(BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED))
 
       make_snackbar("Profile imported", Snackbar.LENGTH_SHORT).show()
     }

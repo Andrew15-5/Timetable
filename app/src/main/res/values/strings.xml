@@ -40,4 +40,7 @@
     <string name="pref_restore_default_settings">restore_default_settings</string>
     <string name="import_timetable_profile">Import timetable profile</string>
     <string name="timetable_profiles">Timetable profiles</string>
+    <string name="delete">Delete</string>
+    <string name="export">Export</string>
+    <string name="edit">Edit</string>
 </resources>
