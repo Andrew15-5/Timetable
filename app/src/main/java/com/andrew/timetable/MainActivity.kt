@@ -80,6 +80,35 @@ class MainActivity : AppCompatActivity() {
     return string_builder.toString()
   }
 
+  private val timetable_profile_picker_launcher = registerForActivityResult(
+    ActivityResultContracts.GetContent()
+  ) { uri ->
+    if (uri == null) {
+      make_snackbar("No profile was selected", Snackbar.LENGTH_LONG).show()
+      return@registerForActivityResult
+    }
+    lifecycleScope.launch {
+      val imported_profile = read_text(uri) ?: return@launch
+
+      val db = DatabaseHelper.instance(this@MainActivity)
+      val profile = TimetableProfile.fromJSON(imported_profile)
+      val result = db.timetable_profileDAO().insert(profile)
+      if (result == -1L) {
+        make_snackbar(
+          "Profile ${profile.name} already exists",
+          Snackbar.LENGTH_SHORT
+        ).show()
+        return@launch
+      }
+
+      LocalBroadcastManager
+        .getInstance(this@MainActivity)
+        .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
+
+      make_snackbar("Profile imported", Snackbar.LENGTH_SHORT).show()
+    }
+  }
+
   private val backup_file_picker_launcher = registerForActivityResult(
     ActivityResultContracts.GetContent()
   ) { uri ->
@@ -240,6 +269,10 @@ class MainActivity : AppCompatActivity() {
       }
       R.id.restore_from_file_action -> {
         backup_file_picker_launcher.launch("application/json")
+        true
+      }
+      R.id.import_timetable_profile_action -> {
+        timetable_profile_picker_launcher.launch("application/json")
         true
       }
       else -> super.onOptionsItemSelected(item)
