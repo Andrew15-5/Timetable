@@ -28,6 +28,15 @@ class TimetableProfilesFragment : Fragment() {
     }
   }
 
+  private val on_delete_button_click = fun(name: String): View.OnClickListener {
+    return View.OnClickListener {
+      lifecycleScope.launch {
+        timetable_profileDAO.delete(name)
+        update_profiles()
+      }
+    }
+  }
+
   private fun update_profiles() {
     lifecycleScope.launch {
       profiles = timetable_profileDAO.get_all()
@@ -39,7 +48,11 @@ class TimetableProfilesFragment : Fragment() {
       binding.timetableProfilesListView.visibility = View.VISIBLE
       binding.noTimetableProfiles.visibility = View.GONE
       binding.timetableProfilesListView.adapter =
-        TimetableProfileAdapter(requireActivity(), profiles)
+        TimetableProfileAdapter(
+          requireActivity(),
+          profiles,
+          on_delete_button_click
+        )
     }
   }
 

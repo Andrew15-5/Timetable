@@ -16,6 +16,9 @@ interface TimetableProfileDAO {
   @Delete
   suspend fun delete(timetable_profile: TimetableProfile)
 
+  @Query("DELETE FROM timetable_profiles WHERE name = :name")
+  suspend fun delete(name: String)
+
   // @Insert(onConflict = OnConflictStrategy.IGNORE)
   // suspend fun insert_all(profiles: List<Profile>): List<Long>
   //

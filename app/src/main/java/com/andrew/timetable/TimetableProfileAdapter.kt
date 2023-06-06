@@ -10,6 +10,7 @@ import com.andrew.timetable.databinding.TimetableProfileListItemBinding
 class TimetableProfileAdapter(
   private val context: Context,
   private val items: List<TimetableProfile>,
+  private val on_delete_button_click: (String) -> View.OnClickListener,
 ) : BaseAdapter() {
 
   override fun getCount(): Int {
@@ -45,6 +46,7 @@ class TimetableProfileAdapter(
     item_view.tag = binding
     val item = items[position]
     binding.name.text = item.name
+    binding.deleteButton.setOnClickListener(on_delete_button_click(item.name))
     return item_view
   }
 }
