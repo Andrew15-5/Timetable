@@ -1,26 +1,56 @@
 package com.andrew.timetable
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
-import com.google.gson.Gson
+import com.andrew.timetable.MainActivity.Companion.BROADCAST_ACTION_APP_SETTINGS_UPDATED
 import kotlinx.coroutines.launch
 
 class SettingsFragment : PreferenceFragmentCompat() {
-  lateinit var app_settings: AppSettings
   lateinit var app_settingsDAO: AppSettingsDAO
 
-  override fun onCreatePreferences(
-    savedInstanceState: Bundle?,
-    rootKey: String?,
-  ) {
+  val broadcast_receiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+      if (intent?.action == BROADCAST_ACTION_APP_SETTINGS_UPDATED) {
+        sync_preferences()
+      }
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    val intent_filter = IntentFilter(BROADCAST_ACTION_APP_SETTINGS_UPDATED)
+    LocalBroadcastManager.getInstance(requireContext())
+      .registerReceiver(broadcast_receiver, intent_filter)
+  }
+
+  override fun onPause() {
+    LocalBroadcastManager.getInstance(requireContext())
+      .unregisterReceiver(broadcast_receiver)
+    super.onPause()
+  }
+
+  fun sync_preferences() = sync_preferences(null, false)
+  fun sync_preferences(rootKey: String?, is_init: Boolean) {
     lifecycleScope.launch {
-      val db = DatabaseHelper.instance(requireContext())
-      app_settingsDAO = db.app_settingsDAO()
-      app_settings = app_settingsDAO.get()!!
-      setPreferencesFromResource(R.xml.settings_screen, rootKey)
+      val app_settings: AppSettings
+
+      if (is_init) {
+        val db = DatabaseHelper.instance(requireContext())
+        app_settingsDAO = db.app_settingsDAO()
+        app_settings = app_settingsDAO.get()!!
+        setPreferencesFromResource(R.xml.settings_screen, rootKey)
+      } else {
+        app_settings = app_settingsDAO.get()!!
+      }
+
       val t = app_settings.timings
       mapOf(
         R.string.pref_time_since_lesson_started to t.time_since_lesson_started,
@@ -37,6 +67,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
   }
 
+  override fun onCreatePreferences(
+    savedInstanceState: Bundle?,
+    rootKey: String?,
+  ) = sync_preferences(rootKey, true)
+
   override fun onPreferenceTreeClick(preference: Preference): Boolean {
     val time_since_lesson_started =
       getString(R.string.pref_time_since_lesson_started)
@@ -47,23 +82,25 @@ class SettingsFragment : PreferenceFragmentCompat() {
     val halfs_time_left = getString(R.string.pref_halfs_time_left)
     val time_until_next_half = getString(R.string.pref_time_until_next_half)
 
-    when (preference.key) {
-      time_since_lesson_started -> app_settings
-        .timings.time_since_lesson_started =
-        (preference as SwitchPreferenceCompat).isChecked
-      lessons_time_left -> app_settings.timings.lessons_time_left =
-        (preference as SwitchPreferenceCompat).isChecked
-      time_until_next_lesson -> app_settings.timings.time_until_next_lesson =
-        (preference as SwitchPreferenceCompat).isChecked
-      time_since_half_started -> app_settings.timings.time_since_half_started =
-        (preference as SwitchPreferenceCompat).isChecked
-      halfs_time_left -> app_settings.timings.halfs_time_left =
-        (preference as SwitchPreferenceCompat).isChecked
-      time_until_next_half -> app_settings.timings.time_until_next_half =
-        (preference as SwitchPreferenceCompat).isChecked
-    }
-
     lifecycleScope.launch {
+      val app_settings = app_settingsDAO.get()!!
+
+      when (preference.key) {
+        time_since_lesson_started -> app_settings
+          .timings.time_since_lesson_started =
+          (preference as SwitchPreferenceCompat).isChecked
+        lessons_time_left -> app_settings.timings.lessons_time_left =
+          (preference as SwitchPreferenceCompat).isChecked
+        time_until_next_lesson -> app_settings.timings.time_until_next_lesson =
+          (preference as SwitchPreferenceCompat).isChecked
+        time_since_half_started -> app_settings.timings.time_since_half_started =
+          (preference as SwitchPreferenceCompat).isChecked
+        halfs_time_left -> app_settings.timings.halfs_time_left =
+          (preference as SwitchPreferenceCompat).isChecked
+        time_until_next_half -> app_settings.timings.time_until_next_half =
+          (preference as SwitchPreferenceCompat).isChecked
+      }
+
       app_settingsDAO.update(app_settings)
     }
 

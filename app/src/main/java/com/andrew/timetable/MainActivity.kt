@@ -2,6 +2,7 @@ package com.andrew.timetable
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.util.TypedValue
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -36,6 +38,11 @@ class MainActivity : AppCompatActivity() {
   private val current_fragment
     get() = fragment_manager.primaryNavigationFragment
   private lateinit var backup_dir: File
+
+  companion object {
+    const val BROADCAST_ACTION_APP_SETTINGS_UPDATED =
+      "${BuildConfig.APPLICATION_ID}.broadcast.app_settings_updated"
+  }
 
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -156,6 +163,10 @@ class MainActivity : AppCompatActivity() {
             val app_settings =
               Gson().fromJson(restored_text, AppSettings::class.java)
             db.app_settingsDAO().update(app_settings)
+
+            LocalBroadcastManager
+              .getInstance(this@MainActivity)
+              .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
             snackbar.show()
           }
         }

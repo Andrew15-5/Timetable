@@ -1,6 +1,10 @@
 package com.andrew.timetable
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,6 +16,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.andrew.timetable.MainActivity.Companion.BROADCAST_ACTION_APP_SETTINGS_UPDATED
 import com.andrew.timetable.databinding.FragmentMainBinding
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -35,7 +41,28 @@ class MainFragment : Fragment() {
       set_text_of_timeAndWeekTextView(text)
   }
 
-  private suspend fun timings() = app_settingsDAO.get()!!.timings
+  private var timings: Timings? = null
+
+  val broadcast_receiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+      if (intent?.action == BROADCAST_ACTION_APP_SETTINGS_UPDATED) {
+        update_timings_visibility()
+      }
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    val intent_filter = IntentFilter(BROADCAST_ACTION_APP_SETTINGS_UPDATED)
+    LocalBroadcastManager.getInstance(requireContext())
+      .registerReceiver(broadcast_receiver, intent_filter)
+  }
+
+  override fun onPause() {
+    LocalBroadcastManager.getInstance(requireContext())
+      .unregisterReceiver(broadcast_receiver)
+    super.onPause()
+  }
 
   private fun create_TextView(
     text: String,
@@ -106,6 +133,28 @@ class MainFragment : Fragment() {
     return binding.root
   }
 
+  fun update_timings_visibility() {
+    log("update_timings_visibility()")
+    val visibility = mapOf(true to View.VISIBLE, false to View.GONE)
+    lifecycleScope.launch {
+      timings = app_settingsDAO.get()!!.timings
+      timings?.apply {
+        binding.timeSinceLessonStarted.visibility =
+          visibility[this.time_since_lesson_started]!!
+        binding.timeSinceHalfStarted.visibility =
+          visibility[this.time_since_half_started]!!
+        binding.lessonsTimeLeft.visibility =
+          visibility[this.lessons_time_left]!!
+        binding.halfsTimeLeft.visibility =
+          visibility[this.halfs_time_left]!!
+        binding.timeUntilNextLesson.visibility =
+          visibility[this.time_until_next_lesson]!!
+        binding.timeUntilNextHalf.visibility =
+          visibility[this.time_until_next_half]!!
+      }
+    }
+  }
+
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -114,6 +163,7 @@ class MainFragment : Fragment() {
 
     lifecycleScope.launch {
       app_settingsDAO = DatabaseHelper.instance(activity).app_settingsDAO()
+      update_timings_visibility()
     }
 
     default_color = activity.getColor(R.color.default_color)
@@ -306,24 +356,6 @@ class MainFragment : Fragment() {
           utils.get_time_until_next_lesson(current_time)
         val time_until_next_half =
           utils.get_time_until_next_half(current_time)
-
-        lifecycleScope.launch {
-          val visibility = mapOf(true to View.VISIBLE, false to View.GONE)
-          timings().apply {
-            binding.timeSinceLessonStarted.visibility =
-              visibility[this.time_since_lesson_started]!!
-            binding.timeSinceHalfStarted.visibility =
-              visibility[this.time_since_half_started]!!
-            binding.lessonsTimeLeft.visibility =
-              visibility[this.lessons_time_left]!!
-            binding.halfsTimeLeft.visibility =
-              visibility[this.halfs_time_left]!!
-            binding.timeUntilNextLesson.visibility =
-              visibility[this.time_until_next_lesson]!!
-            binding.timeUntilNextHalf.visibility =
-              visibility[this.time_until_next_half]!!
-          }
-        }
 
         binding.timeSinceLessonStartedTextView.text = time_since_lesson_started
         binding.timeSinceHalfStartedTextView.text = time_since_half_started
