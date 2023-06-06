@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
-import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -35,6 +34,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
+import com.andrew.timetable.Snackbar.Companion as ThemedSnackbar
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
@@ -256,14 +256,11 @@ class MainActivity : AppCompatActivity() {
   }
 
   fun make_snackbar(text: String, duration: Int): Snackbar {
-    val typed_value = TypedValue()
-    theme.resolveAttribute(R.attr.colorOnPrimary, typed_value, true)
-    val text_color = typed_value.data
-    val background_color = getColor(R.color.snackbar)
-    val snack_bar = Snackbar
-      .make(binding.root, text, duration)
-      .setTextColor(text_color)
-    snack_bar.view.setBackgroundColor(background_color)
-    return snack_bar
+    return ThemedSnackbar.make(
+      this,
+      binding.root,
+      text,
+      duration
+    )
   }
 }
