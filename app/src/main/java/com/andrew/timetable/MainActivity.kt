@@ -201,9 +201,15 @@ class MainActivity : AppCompatActivity() {
     _is_timeAndWeekTextView_mutable = false
     return when (item.itemId) {
       R.id.settings_action -> {
-        if (current_fragment is SettingsFragment) return true
-        clear_text_of_timeAndWeekTextView()
-        nav_controller.navigate(R.id.settingsFragment)
+        nav_controller.navigate(
+          when (current_fragment) {
+            is MainFragment -> {
+              clear_text_of_timeAndWeekTextView()
+              R.id.action_mainFragment_to_settingsFragment
+            }
+            else -> return true
+          }
+        )
         true
       }
       R.id.backup_action -> {
