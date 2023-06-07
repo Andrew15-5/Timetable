@@ -141,7 +141,6 @@ class TimetableProfilesFragment : Fragment() {
     edit_launcher = registerForActivityResult(
       ActivityResultContracts.StartActivityForResult()
     ) {
-      log("results: resultCode - ${it.resultCode}, data - ${it.data}")
       if (it.resultCode == RESULT_OK) {
         ok_message.show()
         update_profiles()
