@@ -18,40 +18,4 @@ interface TimetableProfileDAO {
 
   @Query("DELETE FROM timetable_profiles WHERE name = :name")
   suspend fun delete(name: String)
-
-  // @Insert(onConflict = OnConflictStrategy.IGNORE)
-  // suspend fun insert_all(profiles: List<Profile>): List<Long>
-  //
-  // @Insert(onConflict = OnConflictStrategy.IGNORE)
-  // suspend fun insert_all_and_update_id(profiles: List<Profile>): List<Long> {
-  //   val ids = insert_all(profiles)
-  //   for ((i, id) in ids.withIndex()) profiles[i].id = id
-  //   return ids
-  // }
-  //
-  // @Insert(onConflict = OnConflictStrategy.IGNORE)
-  // suspend fun insert_all(vararg profiles: Profile): List<Long>
-  //
-  // @Insert(onConflict = OnConflictStrategy.IGNORE)
-  // suspend fun insert_all_and_update_id(vararg profiles: Profile): List<Long> {
-  //   return insert_all_and_update_id((profiles).toList())
-  // }
-  //
-  // @Update
-  // suspend fun update_all(profiles: List<Profile>): Long
-  //
-  // @Update
-  // suspend fun update_all(vararg profiles: Profile): Long
-  //
-  // @Delete
-  // suspend fun delete(profile: Profile)
-  //
-  // @Delete
-  // suspend fun delete_all(profiles: List<Profile>)
-  //
-  // @Delete
-  // suspend fun delete_all(vararg profiles: Profile)
-  //
-  // @Delete
-  // suspend fun delete_all() = delete_all(get_all())
 }
