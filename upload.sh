@@ -38,7 +38,7 @@ staged_version_change_exists() {
 }
 
 stage_new_version() {
-  echo 'Add updated version lines to stage'
+  echo 'Add updated version lines to stage (after confirmation)'
   printf 'Press Enter key to proceed (Ctrl+C to cancel)'
   read -r _
   git add -p app/build.gradle
