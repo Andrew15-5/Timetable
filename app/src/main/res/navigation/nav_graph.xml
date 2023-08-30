@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment"
+    >
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.andrew.timetable.MainFragment"
+        android:label=""
+        tools:layout="@layout/fragment_main"
+        >
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/mainFragment"
+            />
+        <action
+            android:id="@+id/action_mainFragment_to_timetableProfilesFragment"
+            app:destination="@id/timetableProfilesFragment"
+            app:popUpTo="@id/mainFragment"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.andrew.timetable.SettingsFragment"
+        android:label="Settings"
+        >
+        <action
+            android:id="@+id/action_settingsFragment_to_timetableProfilesFragment"
+            app:destination="@id/timetableProfilesFragment"
+            app:popUpTo="@id/mainFragment"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/timetableProfilesFragment"
+        android:name="com.andrew.timetable.TimetableProfilesFragment"
+        android:label="Timetable profiles"
+        tools:layout="@layout/fragment_timetable_profiles"
+        >
+        <action
+            android:id="@+id/action_timetableProfilesFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/mainFragment"
+            />
+    </fragment>
+</navigation>

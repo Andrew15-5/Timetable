@@ -1,0 +1,66 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Timings">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/pref_time_since_lesson_started"
+            app:summaryOff="@string/timings_summary_off"
+            app:summaryOn="@string/timings_summary_on"
+            app:title="Time since lesson started text"
+            />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/pref_time_since_half_started"
+            app:summaryOff="@string/timings_summary_off"
+            app:summaryOn="@string/timings_summary_on"
+            app:title="Time since half started text"
+            />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/pref_lessons_time_left"
+            app:summaryOff="@string/timings_summary_off"
+            app:summaryOn="@string/timings_summary_on"
+            app:title="Lessons time left text"
+            />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/pref_halfs_time_left"
+            app:summaryOff="@string/timings_summary_off"
+            app:summaryOn="@string/timings_summary_on"
+            app:title="Halfs time left text"
+            />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/pref_time_until_next_lesson"
+            app:summaryOff="@string/timings_summary_off"
+            app:summaryOn="@string/timings_summary_on"
+            app:title="Time until next lesson text"
+            />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="@string/pref_time_until_next_half"
+            app:summaryOff="@string/timings_summary_off"
+            app:summaryOn="@string/timings_summary_on"
+            app:title="Time until next half text"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Destructive settings">
+
+        <Preference
+            app:key="@string/pref_restore_default_settings"
+            app:summary="Everything will be set to default as if the app was freshly installed"
+            app:title="Restore default settings"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

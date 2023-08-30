@@ -1,27 +1,90 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Timetable" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Timetable" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/black</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/black</item>
-        <item name="colorSecondaryVariant">@color/black</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/primary_light_theme</item>
+        <item name="colorSecondaryVariant">@color/yellow</item>
+        <item name="colorOnSecondary">@color/blue</item>
+
+        <item name="backgroundColor">@color/black</item>
+        <item name="android:windowBackground">?backgroundColor</item>
+
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@android:color/transparent</item>
-        <!-- Customize your theme here. -->
-        <item name="windowNoTitle">true</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowBackground">@color/black</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">?colorPrimary</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:textColor">@color/white</item>
+
+        <!--The part with time, notifications, battery level etc.-->
+        <!--        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>-->
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
+
+        <!--        <item name="android:statusBarColor" >@android:color/transparent</item>-->
+        <!-- Customize your theme here. -->
+        <!--        <item name="windowNoTitle">true</item>-->
+        <!--        <item name="android:navigationBarColor">@android:color/transparent</item>-->
+        <!--        <item name="android:windowBackground">@color/black</item>-->
+        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
+        <!--        <item name="android:windowLightStatusBar">false</item>-->
+        <!--        <item name="android:textColor">@color/white</item>-->
     </style>
-    <color name="green">#10D627</color>
-    <color name="time_and_week">#0D27EC</color>
-    <color name="yellow">#D1CE13</color>
-    <color name="red">#C31717</color>
-    <color name="purple">#A219BA</color>
+
+    <!--    <style name="Theme.Timetable.AppBar">-->
+    <!--        <item name="colorPrimary">@color/purple</item>-->
+    <!--        <item name="colorOnPrimary">@color/cyan</item>-->
+    <!--        <item name="colorSecondary">@color/red</item>-->
+    <!--        <item name="colorSecondaryVariant">@color/yellow</item>-->
+    <!--        <item name="colorOnSecondary">@color/blue</item>-->
+
+    <!--        &lt;!&ndash;                <item name="android:titleTextColor">@color/red</item>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                <item name="titleTextColor">@color/yellow</item>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                <item name="subtitleTextColor">@color/yellow</item>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                <item name="android:subtitleTextColor">@color/yellow</item>&ndash;&gt;-->
+
+    <!--        &lt;!&ndash;        <item name="backgroundColor">@color/yellow</item>&ndash;&gt;-->
+
+    <!--        &lt;!&ndash;        &lt;!&ndash;Background of Toolbar&ndash;&gt;&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <item name="background">@color/green</item>&ndash;&gt;-->
+
+    <!--        &lt;!&ndash;        &lt;!&ndash;App name in Toolbar&ndash;&gt;&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <item name="titleTextColor">@color/red</item>&ndash;&gt;-->
+
+
+    <!--        <item name="android:textColor">@color/cyan</item>-->
+    <!--    </style>-->
+
+    <!--    <style name="Theme.Timetable.Toolbar" parent="Widget.AppCompat.Toolbar">-->
+    <style name="Theme.Timetable.Toolbar">
+        <!--Background of Toolbar-->
+        <item name="background">@color/black</item>
+
+        <!--App name in Toolbar-->
+        <item name="titleTextColor">@color/white</item>
+
+        <!--Kebab menu-->
+        <item name="android:tint">@color/white</item>
+    </style>
+
+    <style name="Theme.Timetable.Toolbar.Popup">
+        <!--        menu item backround-->
+        <!--        <item name="android:background">@color/orange</item>-->
+
+        <!--        <item name="popupMenuBackground">@color/orange</item>-->
+
+        <!--        <item name="android:textColor">@color/cyan</item>-->
+    </style>
+
+    <style name="Theme.Timetable.AlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="colorPrimary">?colorOnPrimary</item>
+        <item name="android:windowBackground">?backgroundColor</item>
+    </style>
+
+    <color name="snackbar">@color/dark_gray</color>
+    <color name="time_and_week">#00FFFF</color>
+    <color name="default_color">#00FF00</color>
+    <color name="current_day_color">#FFFF00</color>
+    <color name="recess_color">@color/current_day_color</color>
+    <color name="study_color">#FF0000</color>
+    <color name="left_until_color">#FF00FF</color>
 </resources>

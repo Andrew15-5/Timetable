@@ -1,6 +1,7 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
+    id "kotlin-kapt"
 }
 android {
     compileSdkVersion 33
@@ -11,8 +12,8 @@ android {
         namespace "com.andrew.timetable"
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode 16
-        versionName "0.4.1"
+        versionCode 17
+        versionName "0.5.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -55,6 +56,20 @@ dependencies {
     implementation "androidx.core:core-ktx:1.10.1"
     implementation "com.google.android.material:material:1.9.0"
     implementation 'org.threeten:threetenbp:1.6.5'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+
+    //    Database
+    //    Coroutines
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+    //    JSON
+    implementation 'com.google.code.gson:gson:2.10.1'
+    //    ORM like (DAO)
+    def room_version = "2.5.1"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     testImplementation "junit:junit:4.13.2"
     testImplementation "androidx.arch.core:core-testing:2.2.0"

@@ -1,8 +1,53 @@
 <resources>
     <string name="app_name">Timetable</string>
     <string name="bottom_times_delimiter">\ |\ </string>
+    <string name="time_since_half_started">Time since half started:</string>
+    <string name="time_since_lesson_started">Time since lesson started:</string>
     <string name="lessons_time_left">Lesson\'s time left:</string>
     <string name="time_until_next_half">Time until next half:</string>
     <string name="time_until_next_lesson">Time until next lesson:</string>
     <string name="halfs_time_left">Half\'s time left:</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for
+        incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when
+        manually requested
+    </string>
+    <string name="settings">Settings</string>
+    <string name="database_name">timetable</string>
+    <string name="timings_summary_off">This timing won\'t be shown at the bottom of the main screen</string>
+    <string name="timings_summary_on">This timing will be shown at the bottom of the main screen</string>
+    <string name="pref_time_since_lesson_started">time_since_lesson_started</string>
+    <string name="pref_lessons_time_left">lessons_time_left</string>
+    <string name="pref_time_until_next_lesson">time_until_next_lesson</string>
+    <string name="pref_time_since_half_started">time_since_half_started</string>
+    <string name="pref_halfs_time_left">halfs_time_left</string>
+    <string name="pref_time_until_next_half">time_until_next_half</string>
+    <string name="backup_settings">Make backup</string>
+    <string name="restore_settings">Restore from backup</string>
+    <string name="restore_from_file">Restore from file</string>
+    <string name="pref_restore_default_settings">restore_default_settings</string>
+    <string name="import_timetable_profile">Import timetable profile</string>
+    <string name="timetable_profiles">Timetable profiles</string>
+    <string name="delete">Delete</string>
+    <string name="export">Export</string>
+    <string name="edit">Edit</string>
+    <string name="no_timetables">No timetables</string>
+    <string name="import_timetable">Import timetable</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="editing_timetable_profile">Editing timetable profile</string>
+    <string name="name">Name:</string>
+    <string name="reset">Reset</string>
 </resources>
