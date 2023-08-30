@@ -9,6 +9,7 @@ import java.util.*
 
 class Utils {
   val no_time = "--:--"
+
   // Each line has 4 timings and represent nth lesson ([1;6])
   private val timings_str = arrayOf(
     "8:30", "9:15", "9:20", "10:05",
@@ -37,73 +38,92 @@ class Utils {
     time_periods = mutable_time_periods.toList()
   }
 
+  fun get_time_since_half_started(time: Time): String {
+    val timing_index = get_lesson(time)?.timing_index ?: return no_time
+    val time_difference = time - timings[timing_index]
+    return time_difference.short_format()
+  }
+
   fun get_half_time_left(time: Time): String {
-    val timing_index = get_lesson(time)?.timing_index
-    val study_time = timing_index != null
-    return when {
-      study_time -> timings[timing_index!! + 1].minus(time).short_format()
-      else -> no_time
-    }
+    val timing_index = get_lesson(time)?.timing_index ?: return no_time
+    val time_difference = timings[timing_index + 1] - time
+    return time_difference.short_format()
   }
 
   fun get_time_until_next_half(time: Time): String {
-    val last_recess_end_time = timings.reversed()[1]
-    val lesson_index = get_lesson(time)?.timing_index
-    val recess_index = get_recess(time)?.timing_index
-    val start_time = timings[0]
-    val study_time = lesson_index != null
-    val other_time = when {
-      time < start_time -> start_time
-      time >= last_recess_end_time -> return no_time
-      study_time -> timings[lesson_index!! + 2]
-      else -> timings[recess_index!! + 1]
+    val first_half_start_time = timings[0]
+    val last_half_start_time = timings.reversed()[1]
+    val lesson = get_lesson(time)
+    val recess = get_recess(time)
+    val subtract_from = when {
+      time < first_half_start_time -> first_half_start_time
+      time >= last_half_start_time -> return no_time
+      lesson != null -> timings[lesson.timing_index + 2]
+      else -> timings[recess!!.timing_index + 1]
     }
-    return other_time.minus(time).short_format()
+    val time_difference = subtract_from - time
+    return time_difference.short_format()
+  }
+
+  fun get_time_since_lesson_started(time: Time): String {
+    val lesson = get_lesson(time)
+    val recess = get_recess(time)
+    if (
+      (lesson == null && recess == null) ||
+      (recess != null && recess.is_between_lessons)
+    ) return no_time
+    val subtract = when {
+      recess != null && recess.is_during_lesson -> {
+        timings[recess.timing_index - 1]
+      }
+      else -> when (lesson!!.half) {
+        1 -> timings[lesson.timing_index]
+        else -> timings[lesson.timing_index - 2]
+      }
+    }
+    val time_difference = time - subtract
+    return time_difference.short_format()
   }
 
   fun get_lessons_time_left(time: Time): String {
     val lesson = get_lesson(time)
-    val lesson_index = lesson?.timing_index
     val recess = get_recess(time)
-    val recess_index = recess?.timing_index
-    val recess_time = recess != null
-    val timing_index = lesson_index ?: recess_index
-    val not_study_or_recess_time = timing_index == null
-    val other_time = when {
-      not_study_or_recess_time || recess_time && recess!!
-        .is_between_lessons -> {
-        return no_time
+    if (
+      (lesson == null && recess == null) ||
+      (recess != null && recess.is_between_lessons)
+    ) return no_time
+    val subtract_from = when {
+      recess != null && recess.is_during_lesson -> {
+        timings[recess.timing_index + 2]
       }
-      recess_time && recess!!.is_during_lesson -> timings[recess_index!! + 2]
       else -> when (lesson!!.half) {
-        1 -> timings[lesson_index!! + 3]
-        else -> timings[lesson_index!! + 1]
+        1 -> timings[lesson.timing_index + 3]
+        else -> timings[lesson.timing_index + 1]
       }
     }
-    return other_time.minus(time).short_format()
+    val time_difference = subtract_from - time
+    return time_difference.short_format()
   }
 
   fun get_time_until_next_lesson(time: Time): String {
-    val last_recess_between_lessons_end = timings.reversed()[3]
+    val first_lesson_start_time = timings[0]
+    val last_lesson_start_time = timings.reversed()[3]
     val lesson = get_lesson(time)
-    val lesson_index = lesson?.timing_index
     val recess = get_recess(time)
-    val recess_index = recess?.timing_index
-    val start_time = timings[0]
-    val study_time = lesson != null
-    val other_time = when {
-      time < start_time -> start_time
-      time >= last_recess_between_lessons_end -> return no_time
-      study_time -> when (lesson!!.half) {
-        1 -> timings[lesson_index!! + 4]
-        else -> timings[lesson_index!! + 2]
+    val subtract_from = when {
+      time < first_lesson_start_time -> first_lesson_start_time
+      time >= last_lesson_start_time -> return no_time
+      lesson != null -> when (lesson.half) {
+        1 -> timings[lesson.timing_index + 4]
+        else -> timings[lesson.timing_index + 2]
       }
       else -> when {
-        recess!!.is_during_lesson -> timings[recess_index!! + 3]
-        else -> timings[recess_index!! + 1]
+        recess!!.is_during_lesson -> timings[recess.timing_index + 3]
+        else -> timings[recess.timing_index + 1]
       }
     }
-    return other_time.minus(time).short_format()
+    val time_difference = subtract_from - time
+    return time_difference.short_format()
   }
 
   fun get_recess(time: Time): Recess? {

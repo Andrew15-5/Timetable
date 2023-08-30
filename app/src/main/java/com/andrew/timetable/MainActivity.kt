@@ -1,278 +1,361 @@
 package com.andrew.timetable
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.os.Environment
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.ArrayAdapter
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.andrew.timetable.R.color.*
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.andrew.timetable.databinding.ActivityMainBinding
-import org.json.JSONArray
-import org.json.JSONObject
-import java.util.*
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
+import com.andrew.timetable.Snackbar.Companion as ThemedSnackbar
 
 class MainActivity : AppCompatActivity() {
-  private val TEXT_SIZE = 16F // 18F
-  private val utils = Utils()
-  private val time_periods = utils.time_periods
-
-  // Color aliases
-  private val default_color = green
-  private val current_day_color = yellow
-  private val recess_color = current_day_color
-  private val study_color = red
-
   private lateinit var binding: ActivityMainBinding
+  private lateinit var nav_controller: NavController
+  private lateinit var app_bar_configuration: AppBarConfiguration
+  private lateinit var fragment_manager: FragmentManager
+  private val current_fragment
+    get() = fragment_manager.primaryNavigationFragment
+  private lateinit var backup_dir: File
+  private lateinit var profile_dir: File
+  private var menu: Menu? = null
 
-  private fun create_TextView(
-    text: String,
-    parent_layout: ViewGroup
-  ): TextView {
-    val text_view = TextView(this)
-    with(text_view) {
-      val width = RelativeLayout.LayoutParams.WRAP_CONTENT
-      val height = RelativeLayout.LayoutParams.WRAP_CONTENT
-      layoutParams = RelativeLayout.LayoutParams(width, height)
-      // Note: If color of the week day was changed from default, then
-      // repopulation with default color is visible when switching between
-      // timetable configs. Solution: Remember the color of each line.
-      setTextColor(getColor(default_color))
-      includeFontPadding = false
-      textSize = TEXT_SIZE
-      textAlignment = View.TEXT_ALIGNMENT_CENTER
-      this.text = text
-      parent_layout.addView(this)
-    }
-    return text_view
+  companion object {
+    const val BROADCAST_ACTION_APP_SETTINGS_UPDATED =
+      "${BuildConfig.APPLICATION_ID}.broadcast.app_settings_updated"
+    const val BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED =
+      "${BuildConfig.APPLICATION_ID}.broadcast.timetable_profiles_updated"
   }
 
-  private fun create_week_day_subject_table(
-    text_view_list: MutableList<TextView>,
-    timetable_config: JSONObject,
-    week_day: String
-  ) {
-    val subjects: JSONObject = timetable_config[week_day] as JSONObject
-    text_view_list += create_TextView(week_day, binding.subjectsLayout)
-    for (subject_order in subjects.keys()) {
-      val subject = subjects[subject_order]
-      val subject_str = if (subject is String) subject else ""
-//      when (this) {
-//        is String -> subject_str = this
-//        is Array<*> -> {
-//
-//        }
-//      }
-      text_view_list += create_TextView(
-        "$subject_order. $subject_str", binding.subjectsLayout
-      )
+  private suspend fun read_text(uri: Uri): String? {
+    val parcel_file_descriptor =
+      contentResolver.openFileDescriptor(uri, "r", null)
+    if (parcel_file_descriptor == null) {
+      make_snackbar("Couldn't open file", Snackbar.LENGTH_LONG).show()
+      return null
+    }
+    val file_descriptor = parcel_file_descriptor.fileDescriptor
+    val file_input_stream = FileInputStream(file_descriptor)
+    val buffered_reader = BufferedReader(InputStreamReader(file_input_stream))
+    val string_builder = StringBuilder()
+    var line: String?
+
+    do {
+      line = withContext(Dispatchers.IO) {
+        buffered_reader.readLine()
+      }
+      if (line == null) break
+      if (string_builder.isNotEmpty()) string_builder.append('\n')
+      string_builder.append(line)
+    } while (true)
+    withContext(Dispatchers.IO) {
+      buffered_reader.close()
+      file_input_stream.close()
+    }
+    parcel_file_descriptor.close()
+    return string_builder.toString()
+  }
+
+  private val timetable_profile_picker_launcher = registerForActivityResult(
+    ActivityResultContracts.GetContent()
+  ) { uri ->
+    if (uri == null) {
+      make_snackbar("No profile was selected", Snackbar.LENGTH_LONG).show()
+      return@registerForActivityResult
+    }
+    lifecycleScope.launch {
+      val imported_profile = read_text(uri) ?: return@launch
+
+      val db = DatabaseHelper.instance(this@MainActivity)
+      val profile = TimetableProfile.fromJSON(imported_profile)
+      val result = db.timetable_profileDAO().insert(profile)
+      if (result == -1L) {
+        make_snackbar(
+          "Profile ${profile.name} already exists",
+          Snackbar.LENGTH_SHORT
+        ).show()
+        return@launch
+      }
+
+      LocalBroadcastManager
+        .getInstance(this@MainActivity)
+        .sendBroadcast(Intent(BROADCAST_ACTION_TIMETABLE_PROFILES_UPDATED))
+
+      make_snackbar("Profile imported", Snackbar.LENGTH_SHORT).show()
     }
   }
 
-  private fun repopulate_SubjectLayout(
-    timetable_configs: TimetableConfigs,
-    timeTable: MutableList<MutableList<TextView>>,
-    config: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT
-  ) {
-    binding.subjectsLayout.removeAllViews()
-    timeTable.forEach { it.clear() }
-    for (week_day in
-    timetable_configs.get_config(config).keys().withIndex()) {
-      create_week_day_subject_table(
-        timeTable[week_day.index],
-        timetable_configs.get_current_config(),
-        week_day.value
-      )
+  private val backup_file_picker_launcher = registerForActivityResult(
+    ActivityResultContracts.GetContent()
+  ) { uri ->
+    if (uri == null) {
+      make_snackbar("No file was selected", Snackbar.LENGTH_LONG).show()
+      return@registerForActivityResult
+    }
+
+    val snackbar = make_snackbar("Settings restored", Snackbar.LENGTH_SHORT)
+
+    lifecycleScope.launch {
+      val restored_text = read_text(uri) ?: return@launch
+
+      val db = DatabaseHelper.instance(this@MainActivity)
+      val app_settings = Gson().fromJson(restored_text, AppSettings::class.java)
+      db.app_settingsDAO().update(app_settings)
+
+      LocalBroadcastManager
+        .getInstance(this@MainActivity)
+        .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
+
+      snackbar.show()
     }
   }
 
   @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    val view = binding.root
-    setContentView(view)
-    binding.timeAndWeekTextView.textSize = TEXT_SIZE
-    // Fully transparent navigation & status bars
-    window.setFlags(
-      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-      WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+
+    val downloads_dir = File(
+      Environment.getExternalStoragePublicDirectory(
+        Environment.DIRECTORY_DOWNLOADS
+      ).toURI()
     )
+    val app_name = applicationInfo.loadLabel(packageManager).toString()
+    backup_dir = File(downloads_dir, "$app_name backups")
+    profile_dir = File(downloads_dir, "$app_name profiles")
 
-    // JSON nth subject values:
-    // 1. "Subject" - same "Subject" every week
-    // 2. ["Numerator subject", "Denominator subject"] -
-    //    "Numerator subject" on numerator week,
-    //    "Denominator subject" on denominator week
-    // 3.1. ["", "Denominator subject"] -
-    //      no nth subject on numerator week,
-    //      "Denominator subject" on denominator week
-    // 3.2. ["Numerator subject", ""] -
-    //      "Numerator subject" on numerator week,
-    //      no nth subject on denominator week
-    // Note: instead of empty "" you can use "—" or anything else. This is
-    // useful for intermediate (non-last) pairs which will not disappear with ""
-    // unlike the last pair.
-    val semester = 6
-    val config_names = arrayOf(
-      "IMK4_${semester}s.json",
-      "IMK4_${semester}s_custom.json"
-    )
+    lifecycleScope.launch {
+      // Create instance from the very beginning to not waste time later
+      DatabaseHelper.instance(this@MainActivity)
 
-    val timetable_configs = TimetableConfigs(assets, config_names, 1)
-    val timetable = MutableList<MutableList<TextView>>(6) { mutableListOf() }
-    repopulate_SubjectLayout(timetable_configs, timetable)
-    binding.subjectsLayout.setOnTouchListener { _, event ->
-      when (event.action) {
-        MotionEvent.ACTION_DOWN -> {
-//          val x = event.x.toInt()
-//          val y = event.y.toInt()
-          repopulate_SubjectLayout(
-            timetable_configs, timetable, TimetableConfigs.Config.NEXT
-          )
-        }
-      }
-      true
+      binding = ActivityMainBinding.inflate(layoutInflater)
+      setContentView(binding.root)
+
+      setSupportActionBar(binding.toolbar)
+      fragment_manager = supportFragmentManager.findFragmentById(
+        R.id.navigationContainer
+      )?.childFragmentManager!!
+
+      nav_controller = findNavController(R.id.navigationContainer)
+      app_bar_configuration = AppBarConfiguration(nav_controller.graph)
+      setupActionBarWithNavController(nav_controller, app_bar_configuration)
     }
+  }
 
-    val timetable_for_time_periods = mutableListOf<TextView>()
-    for (line in time_periods) {
-      timetable_for_time_periods += create_TextView(line, binding.timeLayout)
-    }
+  private lateinit var _timings: Timings
+  val timings
+    get() = _timings
 
-    val calendar = Calendar.getInstance()
-    val loop_handler = Handler(Looper.getMainLooper())
-    loop_handler.post(object : Runnable {
-      override fun run() {
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    menuInflater.inflate(R.menu.main, menu)
+    this.menu = menu
+    return true
+  }
 
-        utils.set_calendar_date_for_today(calendar)
+  fun settings_menu_item_visibility(show: Boolean) {
+    menu?.findItem(R.id.settings_action)?.isVisible = show
+  }
 
-        // Note: Sunday = 1 .. Saturday = 7
-        val current_day_of_week = calendar.get(Calendar.DAY_OF_WEEK)
-        val current_year = calendar.get(Calendar.YEAR)
-        val current_week_of_year = utils.get_week_of_year(calendar)
+  fun timetable_profiles_menu_item_visibility(show: Boolean) {
+    menu?.findItem(R.id.timetable_profiles_action)?.isVisible = show
+  }
 
-        val start_date_of_current_semester =
-          utils.get_start_date_of_current_semester(calendar)
-        val first_week_of_semester =
-          utils.get_week_of_year(start_date_of_current_semester)
+  private var _is_timeAndWeekTextView_mutable = true
+  val is_timeAndWeekTextView_mutable
+    get() = _is_timeAndWeekTextView_mutable
 
-        val weeks_offset = current_week_of_year - first_week_of_semester
-        // Note: timetable and week parity is changing every Sunday
-        val today_is_sunday = current_day_of_week == Calendar.SUNDAY
-        val next_week_if_today_is_sunday = if (today_is_sunday) 1 else 0
-        val week = 1 + weeks_offset + next_week_if_today_is_sunday
-        var dnm = week % 2 == 0 // Abbreviation for denominator
+  fun is_attached(fragment: Class<*>): Boolean {
+    return (fragment == fragment_manager.primaryNavigationFragment!!.javaClass)
+  }
 
-        // Starting from 11th week (only in 3rd semester) week parity is swapped
-        if (current_year == 2021 && week >= 11) {
-          dnm = !dnm
-        }
+  private fun clear_text_of_timeAndWeekTextView() {
+    binding.timeAndWeekTextView.text = ""
+  }
 
-        val current_time = Time.now()
-        val formatted_time = current_time.full_format()
-        val week_parity = if (dnm) "denominator" else "numerator"
-        val last_week = 17
-        val current_week = if (week in 1..last_week) week else "18+"
-        binding.timeAndWeekTextView.text =
-          "week $current_week $formatted_time $week_parity"
+  fun set_text_of_timeAndWeekTextView(text: String) {
+    if (!is_timeAndWeekTextView_mutable) return
+    binding.timeAndWeekTextView.text = text
+  }
 
-        // Handle changes in timetable (numerator/denominator, visibility)
-        val timetable_config = timetable_configs.get_current_config()
-        for ((week_day_index, week_day) in
-        timetable_config.keys().withIndex()) {
-          val subjects = timetable_config[week_day] as JSONObject
-          for (subject_order in subjects.keys()) {
-            // tmp is either a String or JSONArray with size 2
-            // Example:
-            // either "subject name"
-            // or ["numerator subject", "denominator subject"]
-            val tmp = subjects[subject_order]
-            if (tmp !is JSONArray) continue // Skip "String" subjects
-            val subject_name = tmp[if (dnm) 1 else 0]
-            val subject_TextView =
-              timetable[week_day_index][subject_order.toInt()]
-            when (subject_name) {
-              "" -> subject_TextView.visibility = View.GONE
-              else -> {
-                subject_TextView.text = "$subject_order. $subject_name"
-                // Check the other string in array
-                if (tmp[if (!dnm) 1 else 0] as String === "")
-                  subject_TextView.visibility = View.VISIBLE
-              }
+  fun import_timetable_profile() {
+    timetable_profile_picker_launcher.launch("application/json")
+  }
+
+  fun backup_timetable_profile(timetable_profile: TimetableProfile) {
+    val app_name = applicationInfo.loadLabel(packageManager).toString()
+    val backup_file_name = "${app_name}_profile_${timetable_profile.name}.json"
+
+    val short_dir =
+      File(profile_dir.parentFile!!.name, backup_dir.name).absolutePath
+    val snackbar =
+      make_snackbar("Profile saved in $short_dir", Snackbar.LENGTH_LONG)
+
+    val backup_text = timetable_profile.toJSON()
+
+    if (!profile_dir.exists()) profile_dir.mkdir()
+    val file = File(profile_dir, backup_file_name)
+    file.writeText(backup_text)
+
+    snackbar.show()
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    _is_timeAndWeekTextView_mutable = false
+    return when (item.itemId) {
+      R.id.settings_action -> {
+        nav_controller.navigate(
+          when (current_fragment) {
+            is MainFragment -> {
+              clear_text_of_timeAndWeekTextView()
+              R.id.action_mainFragment_to_settingsFragment
             }
+            is TimetableProfilesFragment ->
+              R.id.action_timetableProfilesFragment_to_settingsFragment
+            else -> return true
           }
-        }
-
-        val current_lesson = utils.get_lesson(current_time)
-        val current_recess = utils.get_recess(current_time)
-        val is_recess_time = current_recess != null
-        val is_study_time = current_lesson != null
-
-        // --------------------------|Color timetable|--------------------------
-        // Color everything in default color
-        for (week_day_TextViews in timetable) {
-          for (lesson_TextView in week_day_TextViews) {
-            lesson_TextView.setTextColor(getColor(default_color))
-          }
-        }
-
-        if (!today_is_sunday) {
-          // Start week from Monday => "-1"
-          // Start index from 1 => "-1"
-          val week_day_index = current_day_of_week - 2
-          val week_day_TextViews = timetable[week_day_index]
-
-          // Color current day of the week
-          for (lesson_TextView in week_day_TextViews) {
-            lesson_TextView.setTextColor(getColor(current_day_color))
-          }
-
-          // Color current lesson
-          val lesson_number = current_lesson?.lesson
-          if (is_study_time && week_day_TextViews.size > lesson_number!!) {
-            val lesson_TextView = week_day_TextViews[lesson_number]
-            lesson_TextView.setTextColor(getColor(study_color))
-          }
-        }
-        // --------------------------|Color timetable|--------------------------
-
-        // ----------------------------|Color time|-----------------------------
-        // Color all time periods
-        for (i in time_periods.indices) {
-          timetable_for_time_periods[i].setTextColor(getColor(default_color))
-        }
-
-        // Color current time periods
-        if (is_study_time || is_recess_time) {
-          val i = when {
-            is_study_time -> current_lesson!!.time_period_index
-            else -> current_recess!!.time_period_index
-          }
-          val color = if (is_study_time) study_color else recess_color
-          timetable_for_time_periods[i].setTextColor(getColor(color))
-        }
-        // ----------------------------|Color time|-----------------------------
-
-        val halfs_time_left = utils.get_half_time_left(current_time)
-        val time_until_next_half =
-          utils.get_time_until_next_half(current_time)
-        val lessons_time_left = utils.get_lessons_time_left(current_time)
-        val time_until_next_lesson =
-          utils.get_time_until_next_lesson(current_time)
-
-        binding.halfsTimeLeftTextView.text = halfs_time_left
-        binding.timeUntilNextHalfTextView.text = time_until_next_half
-        binding.lessonsTimeLeftTextView.text = lessons_time_left
-        binding.timeUntilNextLessonTextView.text = time_until_next_lesson
-
-        loop_handler.postDelayed(this, 10)
+        )
+        true
       }
-    })
+      R.id.backup_action -> {
+        val zone_id = ZoneId.systemDefault()
+        val iso_format = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        val time_str = Instant.now().atZone(zone_id).format(iso_format)
+          .replace(':', '-')
+        val app_name = applicationInfo.loadLabel(packageManager).toString()
+        val backup_file_name = "${app_name}_backup_${time_str}.json"
+
+        val short_dir =
+          File(backup_dir.parentFile!!.name, backup_dir.name).absolutePath
+        val snackbar =
+          make_snackbar("Backup saved in $short_dir", Snackbar.LENGTH_LONG)
+
+        lifecycleScope.launch {
+          val gson = GsonBuilder().setPrettyPrinting().create()
+          val db = DatabaseHelper.instance(this@MainActivity)
+          val backup_text = gson.toJson(db.app_settingsDAO().get()!!)
+
+          if (!backup_dir.exists()) backup_dir.mkdir()
+          val file = File(backup_dir, backup_file_name)
+          file.writeText(backup_text)
+
+          snackbar.show()
+        }
+        true
+      }
+      R.id.restore_action -> {
+        val list = backup_dir.list()
+        if (list == null || list.isEmpty()) {
+          make_snackbar(
+            "No backups to restore from",
+            Snackbar.LENGTH_LONG
+          ).show()
+          return true
+        }
+        val adapter =
+          ArrayAdapter(this, android.R.layout.simple_list_item_1, list)
+        val snackbar = make_snackbar("Settings restored", Snackbar.LENGTH_SHORT)
+
+        val on_backup_file_selected = fun(
+          _: DialogInterface,
+          selected_index: Int,
+        ) {
+          val file_name = list[selected_index]
+          val file = File(backup_dir, file_name)
+          val restored_text = file.readText()
+
+          lifecycleScope.launch {
+            val db = DatabaseHelper.instance(this@MainActivity)
+            val app_settings =
+              Gson().fromJson(restored_text, AppSettings::class.java)
+            db.app_settingsDAO().update(app_settings)
+
+            LocalBroadcastManager
+              .getInstance(this@MainActivity)
+              .sendBroadcast(Intent(BROADCAST_ACTION_APP_SETTINGS_UPDATED))
+            snackbar.show()
+          }
+        }
+
+        AlertDialog
+          .Builder(this, R.style.Theme_Timetable_AlertDialog)
+          .setTitle("Which backup to restore from")
+          .setAdapter(adapter, on_backup_file_selected)
+          .create()
+          .show()
+        true
+      }
+      R.id.restore_from_file_action -> {
+        backup_file_picker_launcher.launch("application/json")
+        true
+      }
+      R.id.import_timetable_profile_action -> {
+        import_timetable_profile()
+        true
+      }
+      R.id.timetable_profiles_action -> {
+        nav_controller.navigate(
+          when (current_fragment) {
+            is MainFragment -> {
+              clear_text_of_timeAndWeekTextView()
+              R.id.action_mainFragment_to_timetableProfilesFragment
+            }
+            is SettingsFragment ->
+              R.id.action_settingsFragment_to_timetableProfilesFragment
+            else -> return true
+          }
+        )
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
+    }
+  }
+
+  override fun onSupportNavigateUp(): Boolean {
+    _is_timeAndWeekTextView_mutable = true
+    return nav_controller.navigateUp(app_bar_configuration)
+      || super.onSupportNavigateUp()
+  }
+
+  override fun onKeyDown(key_code: Int, event: KeyEvent?): Boolean {
+    if (key_code == KeyEvent.KEYCODE_BACK) {
+      if (onSupportNavigateUp()) return true
+    }
+    return super.onKeyDown(key_code, event)
+  }
+
+  fun make_snackbar(text: String, duration: Int): Snackbar {
+    return ThemedSnackbar.make(
+      this,
+      binding.root,
+      text,
+      duration
+    )
   }
 }
