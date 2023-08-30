@@ -1,5 +1,5 @@
 #!/bin/sh
-cd "$(dirname "$0")" || exit 1
+cd "$(dirname "$0")/.." || exit 1 # Exit scripts/ dir
 
 version_pattern='(\d\.){2}\d'
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 cd "$(dirname "$0")" || exit 1
+scripts_dir=$(basename "$PWD")
+cd .. # Exit scripts/ dir
 
 version_pattern='(\d\.){2}\d'
 version_lines_pattern='^[-+].*version(Code|Name)'
@@ -38,7 +40,7 @@ staged_version_change_exists() {
 }
 
 stage_new_version() {
-  echo 'Add updated version lines to stage'
+  echo 'Add updated version lines to stage (after confirmation)'
   printf 'Press Enter key to proceed (Ctrl+C to cancel)'
   read -r _
   git add -p app/build.gradle
@@ -62,16 +64,16 @@ update_version() {
   version_tag=$(get_version_tag_of_last_commit)
   if [ -z "$version_tag" ]; then
     echo "Last commit doesn't have version tag"
-    version_from_file="$(./version.sh)"
+    version_from_file="$(sh "./$scripts_dir/version.sh")"
     if [ "v$version_from_file" = "$(get_last_version_tag)" ]; then
       printf 'Provide new version (current version: %s): ' "$version_from_file"
       read -r new_version
       is_valid_version "$new_version"
-      ./version.sh "$new_version"
+      sh "./$scripts_dir/version.sh" "$new_version"
       stage_new_version
       commit_new_version
     fi
-    version=$(./version.sh)
+    version=$(sh "./$scripts_dir/version.sh")
     version_tag="v$version"
     echo "Adding $version_tag tag"
     git tag "$version_tag"
