@@ -1,3 +1,4 @@
+alias t := test
 alias u := upload
 alias v := version
 alias d := dev
@@ -19,6 +20,9 @@ init:
     printf "{{pre_commit_file_content}}" > "{{pre_commit_file}}"; \
     chmod +x "{{pre_commit_file}}"; \
   fi
+
+test:
+  sh ./scripts/test.sh
 
 upload: init
   sh ./scripts/upload.sh
