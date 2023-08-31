@@ -229,6 +229,17 @@ class MainActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     _is_timeAndWeekTextView_mutable = false
     return when (item.itemId) {
+      R.id.switch_profile -> {
+        if (current_fragment is MainFragment) {
+          val fragment = (current_fragment as MainFragment)
+          val timetable_configs = fragment.timetable_configs
+          val timetable = fragment.timetable
+          fragment.repopulate_SubjectLayout(
+            timetable_configs, timetable, TimetableConfigs.Config.NEXT
+          )
+        }
+        true
+      }
       R.id.settings_action -> {
         nav_controller.navigate(
           when (current_fragment) {
