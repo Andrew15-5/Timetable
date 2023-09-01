@@ -29,7 +29,8 @@ class MainFragment : Fragment() {
   private val TEXT_SIZE = 16F // 18F
   private val utils = Utils()
   private val time_periods = utils.time_periods
-  private val timetable =
+
+  internal val timetable =
     MutableList<MutableList<TextView>>(6) { mutableListOf() }
 
   private var default_color: Int = 0
@@ -39,7 +40,8 @@ class MainFragment : Fragment() {
   private lateinit var binding: FragmentMainBinding
   private lateinit var app_settingsDAO: AppSettingsDAO
   private lateinit var timetable_profileDAO: TimetableProfileDAO
-  private lateinit var timetable_configs: TimetableConfigs
+
+  internal lateinit var timetable_configs: TimetableConfigs
 
   private fun set_text_of_timeAndWeekTextView(text: String) = activity?.run {
     if ((this as MainActivity).is_attached(this@MainFragment.javaClass))
@@ -118,7 +120,7 @@ class MainFragment : Fragment() {
     }
   }
 
-  private fun repopulate_SubjectLayout(
+  internal fun repopulate_SubjectLayout(
     timetable_configs: TimetableConfigs,
     timeTable: MutableList<MutableList<TextView>>,
     config: TimetableConfigs.Config = TimetableConfigs.Config.CURRENT,
@@ -238,19 +240,6 @@ class MainFragment : Fragment() {
     // Note: instead of empty "" you can use "—" or anything else. This is
     // useful for intermediate (non-last) pairs which will not disappear with ""
     // unlike the last pair.
-
-    binding.subjectsLayout.setOnTouchListener { _, event ->
-      when (event.action) {
-        MotionEvent.ACTION_DOWN -> {
-          //          val x = event.x.toInt()
-          //          val y = event.y.toInt()
-          repopulate_SubjectLayout(
-            timetable_configs, timetable, TimetableConfigs.Config.NEXT
-          )
-        }
-      }
-      true
-    }
 
     val timetable_for_time_periods = mutableListOf<TextView>()
     for (line in time_periods) {

@@ -25,6 +25,7 @@
         manually requested
     </string>
     <string name="settings">Settings</string>
+    <string name="switch_profile">Switch profile</string>
     <string name="database_name">timetable</string>
     <string name="timings_summary_off">This timing won\'t be shown at the bottom of the main screen</string>
     <string name="timings_summary_on">This timing will be shown at the bottom of the main screen</string>
