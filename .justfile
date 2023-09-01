@@ -1,9 +1,11 @@
 alias t := test
 alias u := upload
 alias v := version
-alias d := dev
 alias m := merge
-alias ma := master
+alias i := install
+alias o := open
+
+package-name := "com.andrew.timetable"
 
 scripts_dir := "scripts"
 test_script := "test.sh"
@@ -31,11 +33,11 @@ upload: init
 version:
   sh ./scripts/version.sh
 
-dev:
-  git checkout dev
-
-master:
-  git checkout master
-
 merge branch="dev":
   git merge --no-ff {{branch}}
+
+install:
+  adb install ./app/build/outputs/apk/release/Timetable_v*.apk
+
+open:
+  adb shell am start -n {{package-name}}/{{package-name}}.MainActivity
