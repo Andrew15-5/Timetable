@@ -2,7 +2,8 @@ alias t := test
 alias u := upload
 alias v := version
 alias d := dev
-alias m := master
+alias m := merge
+alias ma := master
 
 scripts_dir := "scripts"
 test_script := "test.sh"
@@ -35,3 +36,6 @@ dev:
 
 master:
   git checkout master
+
+merge branch="dev":
+  git merge --no-ff {{branch}}
