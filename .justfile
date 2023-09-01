@@ -1,9 +1,7 @@
 alias t := test
 alias u := upload
 alias v := version
-alias d := dev
 alias m := merge
-alias ma := master
 alias i := install
 alias o := open
 
@@ -34,12 +32,6 @@ upload: init
 
 version:
   sh ./scripts/version.sh
-
-dev:
-  git checkout dev
-
-master:
-  git checkout master
 
 merge branch="dev":
   git merge --no-ff {{branch}}
