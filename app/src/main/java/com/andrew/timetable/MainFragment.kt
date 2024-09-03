@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -23,7 +22,9 @@ import com.andrew.timetable.databinding.FragmentMainBinding
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.*
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.Month
+import java.util.Calendar
 
 class MainFragment : Fragment() {
   private val TEXT_SIZE = 16F // 18F
@@ -268,7 +269,15 @@ class MainFragment : Fragment() {
         // Note: timetable and week parity is changing every Sunday
         val today_is_sunday = current_day_of_week == Calendar.SUNDAY
         val next_week_if_today_is_sunday = if (today_is_sunday) 1 else 0
-        val week = 1 + weeks_offset + next_week_if_today_is_sunday
+        var week = 1 + weeks_offset + next_week_if_today_is_sunday
+
+        // If 1st day of September is Sunday, then don't count it as the 1st week (e.g., 2024-09-01).
+        if (start_date_of_current_semester.month == Month.SEPTEMBER
+          && start_date_of_current_semester.dayOfWeek == DayOfWeek.SUNDAY
+        ) {
+          week -= 1
+        }
+
         var dnm = week % 2 == 0 // Abbreviation for denominator
 
         // Starting from 11th week (only in 3rd semester) week parity is swapped
