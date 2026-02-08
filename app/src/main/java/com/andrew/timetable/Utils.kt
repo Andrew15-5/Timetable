@@ -167,10 +167,10 @@ class Utils {
       }
       else -> {
         // 2nd semester in the academic year
-        // Get the beginning of the 2nd week of February ()
+        // Get 1st Monday of February if it's on 7th, otherwise get 2nd Monday.
         when (first_monday_of_february) {
-          1 -> LocalDate.of(year, Month.FEBRUARY, 8)
-          else -> LocalDate.of(year, Month.FEBRUARY, first_monday_of_february)
+          7 -> LocalDate.of(year, Month.FEBRUARY, first_monday_of_february)
+          else -> LocalDate.of(year, Month.FEBRUARY, first_monday_of_february + 7)
         }
       }
     }
