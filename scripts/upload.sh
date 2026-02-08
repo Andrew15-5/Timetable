@@ -86,7 +86,7 @@ update_version() {
 
 build_release() {
   echo 'Building release APK file'
-  ./gradlew build --warning-mode all -x assembleDebug -x lintAnalyzeDebug
+  ./gradlew --warning-mode all :app:assembleRelease :app:lintAnalyzeDebug
 }
 
 (set -e
