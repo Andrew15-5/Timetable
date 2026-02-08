@@ -34,6 +34,7 @@ version:
   sh ./scripts/version.sh
 
 merge branch="dev":
+  git checkout master
   git merge --no-ff {{branch}}
 
 install:
